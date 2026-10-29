@@ -1,4 +1,4 @@
-<!-- <!doctype html>
+<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -10,7 +10,9 @@
 html,body{height:100%;margin:0;background:#000;overflow:hidden;color:var(--ui);font-family:'Russo One',Arial,sans-serif;letter-spacing:.06em}
 canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
 #glow{position:fixed;left:0;right:0;bottom:0;height:40%;pointer-events:none;mix-blend-mode:screen}
-#sil{position:fixed;left:0;bottom:0;width:100%;height:6%;pointer-events:none;display:block}
+.ly{position:fixed;left:-4%;bottom:0;width:108%;pointer-events:none;display:block;will-change:transform}
+#l1{height:15%}#l2{height:10%}#sil{height:6%}
+#sk{position:fixed;inset:0;pointer-events:none;mix-blend-mode:screen;background:linear-gradient(to top,rgba(26,38,78,.55) 0%,rgba(12,18,42,.35) 22%,rgba(5,8,20,.2) 55%,rgba(0,0,0,0) 100%)}
 #ctl{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;display:flex;justify-content:space-between;transition:opacity .3s}
 #ctl.off{opacity:0;pointer-events:none}
 .b{width:50px;height:50px;border:0;background:none;color:#fff;font-size:22px;opacity:.2;cursor:pointer;transition:opacity .3s}
@@ -30,14 +32,13 @@ small{display:block;text-align:center;opacity:.7;margin-top:14px;font-size:.75em
 #hd{position:fixed;left:0;right:0;top:11%;text-align:center;pointer-events:none;font-family:'Yatra One','Russo One',serif;color:#ffcf6b;text-shadow:0 0 18px rgba(255,150,30,.8),0 0 50px rgba(255,90,0,.5);opacity:0;animation:hd 9s ease-in-out 1.5s forwards}
 #hd b{display:block;font-weight:400;font-size:clamp(28px,6vw,64px);letter-spacing:.08em}#hd i{display:block;font-style:normal;font-size:clamp(14px,2.2vw,24px);margin-top:6px;opacity:.8}
 @keyframes hd{0%{opacity:0;transform:translateY(8px)}18%,70%{opacity:1;transform:none}100%{opacity:0}}
-#dy{position:fixed;left:0;right:0;bottom:0;height:14px;pointer-events:none}
-#dy u{position:absolute;bottom:2px;width:7px;height:9px;border-radius:50% 50% 40% 40%;background:radial-gradient(circle at 50% 70%,#fff4b0,#ffa317 45%,rgba(255,90,0,0) 75%);box-shadow:0 0 12px 4px rgba(255,140,20,.55);animation:fl 1.6s ease-in-out infinite alternate}
-@keyframes fl{from{opacity:.6;transform:scale(.9)}to{opacity:1;transform:scale(1.08)}}
 </style></head>
 <body>
 <canvas id="c"></canvas>
+<div id="sk"></div>
+<svg class="ly" id="l1" viewBox="0 0 200 20" preserveAspectRatio="none"></svg><svg class="ly" id="l2" viewBox="0 0 200 20" preserveAspectRatio="none"></svg>
 <div id="glow"></div>
-<svg id="sil" viewBox="0 0 200 10" preserveAspectRatio="none"></svg><div id="hd"><b>शुभ दीपावली</b><i>Happy Diwali</i></div><div id="dy"></div>
+<svg class="ly" id="sil" viewBox="0 0 200 10" preserveAspectRatio="none"></svg><div id="hd"><b>शुभ दीपावली</b><i>Happy Diwali</i></div>
 <div id="ctl"><button class="b" id="bp">⏸</button><button class="b" id="bs">🔇</button><button class="b" id="bm">⚙</button></div>
 <div id="menu"><div class="in"><h2>Settings</h2>
 <label><span>Shell Type</span><select id="o_shell"></select></label>
@@ -57,8 +58,6 @@ small{display:block;text-align:center;opacity:.7;margin-top:14px;font-size:.75em
 //  • white-hot -> colour -> orange ember colour curve on every star
 //  • gradient comet trails + sparks that fade out as they burn
 //  • soft bloom layer, twinkling night sky, tree-line silhouette
-//  • NEW: volumetric smoke - procedural turbulent (fbm) puffs that rotate, billow, erode into wisps,
-//    drift with the wind, get lit by each burst's colour and fall back into darkness
 //  • speed-of-sound delay: bang arrives after the flash, farther shells = longer delay
 const R=Math.random,TAU=Math.PI*2,rnd=(a,b)=>a+R()*(b-a),$=id=>document.getElementById(id);
 const IS_MOBILE=innerWidth<=640,HI=(navigator.hardwareConcurrency||0)>=(innerWidth<=1024?4:8);
@@ -122,10 +121,14 @@ const glow=(()=>{const c=document.createElement('canvas');c.width=c.height=64;co
 const flashTex=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),g=x.createRadialGradient(64,64,0,64,64,64);
   g.addColorStop(.024,'rgba(255,255,255,1)');g.addColorStop(.125,'rgba(255,160,20,.2)');g.addColorStop(.32,'rgba(255,140,20,.11)');g.addColorStop(1,'rgba(255,120,20,0)');x.fillStyle=g;x.fillRect(0,0,128,128);return new THREE.CanvasTexture(c)})();
 // night-sky starfield (far away, dim, twinkles)
-const SN=240,SP=new Float32Array(SN*3),SC=new Float32Array(SN*3);
-for(let i=0;i<SN;i++){SP[i*3]=(R()*2-1)*3600;SP[i*3+1]=R()*3800;SP[i*3+2]=-5000-R()*400;const b=.06+Math.pow(R(),4)*.4,t=R();SC[i*3]=b*(.8+.2*t);SC[i*3+1]=b*.9;SC[i*3+2]=b*(1-.2*t)}
+// stars sit at many different depths (near ones are bigger/brighter and drift more when the camera sways = parallax), plus a faint Milky Way band
+const SN=1500,SP=new Float32Array(SN*3),SC=new Float32Array(SN*3);
+for(let i=0;i<SN;i++){let x,y,z,b;
+  if(i<650){z=-(1800+R()*3400);x=(R()*2-1)*-z*.8;y=-z*(R()*1.1-.05);b=.06+Math.pow(R(),4)*.4}
+  else{z=-(4600+R()*500);const u=(R()*2-1)*4600,v=(R()+R()+R()-1.5)*520,a=.5;x=u*Math.cos(a)-v*Math.sin(a);y=2300+u*Math.sin(a)+v*Math.cos(a);b=.03+R()*.1*Math.exp(-Math.abs(v)/350)}
+  const t=R();SP[i*3]=x;SP[i*3+1]=y;SP[i*3+2]=z;SC[i*3]=b*(.8+.2*t);SC[i*3+1]=b*.9;SC[i*3+2]=b*(1-.2*t)}
 const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.BufferAttribute(SP,3));sg.setAttribute('color',new THREE.BufferAttribute(SC,3));
-const skyStars=new THREE.Points(sg,new THREE.PointsMaterial({size:1.5,sizeAttenuation:false,vertexColors:true,transparent:true,opacity:.8,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending}));
+const skyStars=new THREE.Points(sg,new THREE.PointsMaterial({size:6,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.8,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending}));
 const CAPS=7000,CAPK=14000;
 const PP=new Float32Array(CAPS*3),PC=new Float32Array(CAPS*3);
 const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(PP,3).setUsage(THREE.DynamicDrawUsage));pg.setAttribute('color',new THREE.BufferAttribute(PC,3).setUsage(THREE.DynamicDrawUsage));
@@ -148,61 +151,39 @@ vec2 n=vec2(-dir.y,dir.x),p=sa+dir*L*aux.y+n*aux.x*abs(aux.z)*mix(1.,.2,aux.y*st
 vC=color;vA=vec3(aux.xy,aux.z<0.?1.:0.);gl_Position=vec4(p/(uRes*.5),0.,1.);}`,
   fragmentShader:`varying vec3 vC;varying vec3 vA;void main(){float t=1.-vA.y;gl_FragColor=vec4(vC*1.4,mix(t*t,1.,vA.z)*(1.-vA.x*vA.x));}`});
 const pmat=o=>new THREE.PointsMaterial({map:glow,size:10,vertexColors:true,transparent:true,opacity:o,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending});
-const pts=new THREE.Points(pg,pmat(1)),bloom=new THREE.Points(pg,pmat(.09)); // bloom = same particles, huge + faint
+const pts=new THREE.Points(pg,pmat(1)),bloom=new THREE.Points(pg,pmat(.035)); // bloom = same particles, huge + faint
 const lines=new THREE.Mesh(lg,rMat);
 [skyStars,bloom,pts,lines].forEach(o=>{o.frustumCulled=false;scene.add(o)});
 const flashPool=[];let flashActive=[],glowB=0;
 const lights=[];let shake=0;
-function burstFlash(x,y,z,r,c){if(c!==undefined&&lights.length<24){c=Array.isArray(c)?c[0]:(c&&c!=='random'&&c!==INV?c:COLOR.Gold);lights.push({x,y,z,r:r*5,cr:c.r/255,cg:c.g/255,cb:c.b/255,i:Math.min(2,r/70),life:3500,full:3500});if(r>60)shake=Math.min(1,shake+r/260)}
+function burstFlash(x,y,z,r,c){if(c!==undefined&&lights.length<24){c=Array.isArray(c)?c[0]:(c&&c!=='random'&&c!==INV?c:COLOR.Gold);lights.push({x,y,z,r:r*5,cr:c.r/255,cg:c.g/255,cb:c.b/255,i:Math.min(.8,r/70),life:3500,full:3500});if(r>60)shake=Math.min(1,shake+r/260)}
   const s=flashPool.pop()||new THREE.Sprite(new THREE.SpriteMaterial({map:flashTex,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending}));
-  s.position.set(x,y,z);s.scale.set(r*1.8,r*1.8,1);scene.add(s);flashActive.push(s);glowB=Math.min(1,glowB+r/900)}
+  s.position.set(x,y,z);const fr_=Math.min(r*1.1,120);s.scale.set(fr_,fr_,1);s.material.opacity=.55;scene.add(s);flashActive.push(s);glowB=Math.min(.4,glowB+r/2600)}
 
-// ---------- volumetric smoke
-// Each puff is a camera-facing sprite whose shape is generated in the fragment shader from rotated fractal noise.
-// As a puff ages the noise threshold rises, so it erodes into thin wisps instead of fading as a blurry blob.
-const CAPM=1800,MP=new Float32Array(CAPM*3),MC=new Float32Array(CAPM*3),MS=new Float32Array(CAPM),MI=new Float32Array(CAPM*2),smoke=[];
-const mg=new THREE.BufferGeometry();
-[['position',MP,3],['color',MC,3],['size',MS,1],['info',MI,2]].forEach(([n,a,k])=>mg.setAttribute(n,new THREE.BufferAttribute(a,k).setUsage(THREE.DynamicDrawUsage)));
-const smokeMat=new THREE.ShaderMaterial({uniforms:{uS:{value:1}},transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,
-  vertexShader:`attribute float size;attribute vec3 color;attribute vec2 info;varying vec3 vC;varying vec2 vI;uniform float uS;
-void main(){vC=color;vI=info;vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=min(size*uS/-mv.z,900.);gl_Position=projectionMatrix*mv;}`,
-  fragmentShader:`varying vec3 vC;varying vec2 vI;
-float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x),f.y);}
-float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p=p*2.03+vec2(17.,9.);a*=.5;}return v;}
-void main(){
-  vec2 q=gl_PointCoord*2.-1.;float ang=vI.x*6.2832+vI.y*.6,s=sin(ang),c=cos(ang);q=mat2(c,-s,s,c)*q;
-  float r=length(q);
-  vec2 w=vec2(fbm(q*1.6+vI.x*31.),fbm(q*1.6+vI.x*17.+5.2));         // domain warp -> billowy curls
-  float d=fbm(q*2.1+(w-.5)*1.3+vI.x*53.+vI.y*.35);
-  float edge=smoothstep(1.,.25,r+(d-.5)*.55);
-  float th=vI.y*.5;                                                  // erosion grows with age
-  float a=smoothstep(th,th+.32,d)*edge;
-  float lit=.45+.9*d;                                                // dense core catches more light
-  gl_FragColor=vec4(vC*lit,a);
-}`});
-const smokePts=new THREE.Points(mg,smokeMat);smokePts.frustumCulled=false;scene.add(smokePts);
-// n puffs scattered inside radius rad, drifting outward at speed out; sz = puff diameter; lf = life scale; a = opacity scale
-function addSmoke(x,y,z,n,rad,out,sz,lf=1,a=1){for(let i=0;i<n&&smoke.length<CAPM;i++){rdir();const l=(7000+R()*6000)*lf,k=Math.pow(R(),.6);
-  smoke.push({x:x+D[0]*rad*k,y:y+D[1]*rad*k*.8,z:z+D[2]*rad*k,sz:sz*(.5+R()*.8),life:l,full:l,vx:D[0]*out*(.4+R()*.6)+(R()-.5)*.04,vy:D[1]*out*.7+.015+R()*.03,vz:D[2]*out*(.4+R()*.6),a:(.6+R()*.5)*a,seed:R()})}}
 
 let aspect=1,FOV=42,TOP=38;
 function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);aspect=w/h;FOV=aspect<.8?62:42;camera.fov=FOV;camera.aspect=aspect;
   const pitch=FOV/2-4;camera.rotation.set(pitch*Math.PI/180,0,0);TOP=pitch+FOV/2;camera.updateProjectionMatrix();
-  pts.material.size=3*2*1300/h*(FOV/42);bloom.material.size=pts.material.size*4;smokeMat.uniforms.uS.value=renderer.domElement.height/(2*Math.tan(FOV*Math.PI/360));rMat.uniforms.uRes.value.set(renderer.domElement.width,renderer.domElement.height);
+  pts.material.size=3*2*1300/h*(FOV/42);skyStars.material.size=1.7*7000/h;bloom.material.size=pts.material.size*4;rMat.uniforms.uRes.value.set(renderer.domElement.width,renderer.domElement.height);
   renderer.setClearColor(0x000000,1);renderer.clear()}
 addEventListener('resize',resize);resize();
 // where a (screen-fraction h, height v) launch lands in 3D at depth z
 function place(h,v,z){const az=Math.abs(z),hw=Math.tan(FOV*Math.PI/360)*aspect*az,f=.45+v*.5,e=(-4+f*(TOP+4))*Math.PI/180;return[(h*2-1)*hw*.88,az*Math.tan(e)]}
 const rz=()=>-(950+R()*750);
 
-(()=>{const d=$('dy');for(let i=0;i<46;i++){const u=document.createElement('u');u.style.left=(i*2.2+R()*1.2+1)+'%';u.style.animationDelay=(-R()*2)+'s';u.style.animationDuration=(1.2+R()*1.2)+'s';d.appendChild(u)}})();
+
 // tree-line silhouette
 (()=>{let d='M0 10',h=4;for(let i=0;i<=200;i+=1.6){h+=(R()-.5)*2.2;h=Math.max(2.2,Math.min(6.5,h));const spike=R()<.35?R()*2.2:0;d+=` L${i.toFixed(1)} ${(10-h-spike).toFixed(2)} L${(i+.8).toFixed(1)} ${(10-h+.6).toFixed(2)}`}
   $('sil').innerHTML=`<path d="${d} L200 10 Z" fill="#000"/>`})();
+const LY=[$('l1'),$('l2'),$('sil')];
+// layered mountain ridges: far ones are bluer/hazier and sway less than near ones -> parallax depth; burst light tints them via #glow
+[['l1','#0e1a36','#05070f',7,5.5],['l2','#070b18','#020309',4.5,3.6]].forEach(([id,c1,c2,base,amp],n)=>{
+  const p=[R()*6,R()*6,R()*6],f=n?1.35:1;let d='M0 20';
+  for(let i=0;i<=200;i+=1){const h=base+amp*(Math.sin(i*.028*f+p[0])*.5+Math.sin(i*.071*f+p[1])*.3+Math.sin(i*.17*f+p[2])*.2)+(R()-.5)*.35;d+=` L${i} ${(20-h).toFixed(2)}`}
+  $(id).innerHTML=`<defs><linearGradient id="g${n}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><path d="${d} L200 20 Z" fill="url(#g${n})"/>`});
 
 // ---------- particles
-const H=20,TL=6,GRAV=1.1,stars=[],sparks=[],starPool=[],sparkPool=[],D=[0,0,0];
+const H=20,TL=12,GRAV=.9,stars=[],sparks=[],starPool=[],sparkPool=[],D=[0,0,0];
 let wind=0,windT=R()*100;
 function rdir(){const z=2*R()-1,a=R()*TAU,r=Math.sqrt(1-z*z);D[0]=r*Math.cos(a);D[1]=z;D[2]=r*Math.sin(a);return D}
 function addStar(x,y,z,c,dx,dy,dz,sp,life,ox=0,oy=0,oz=0){const s=starPool.pop()||{};s.x=s.px=x;s.y=s.py=y;s.z=s.pz=z;s.vx=dx*sp+ox;s.vy=dy*sp+oy;s.vz=dz*sp+oz;s.life=s.full=life;s.c=c;s.sk=c;
@@ -258,10 +239,7 @@ class Shell{
     if(this.pistil)new Shell({spreadSize:this.spreadSize*.5,starLife:this.starLife*.6,starLifeVariation:this.starLifeVariation,starDensity:1.4,color:this.pistilColor,glitter:'light',glitterColor:this.pistilColor===COLOR.Gold?COLOR.Gold:COLOR.White}).burst(x,y,z);
     if(this.streamers)new Shell({spreadSize:this.spreadSize*.9,starLife:this.starLife*.8,starLifeVariation:this.starLifeVariation,starCount:Math.floor(Math.max(6,this.spreadSize/45)),color:COLOR.White,glitter:'streamer'}).burst(x,y,z);
     burstFlash(x,y,z,this.spreadSize/4,this.comet?this.color:undefined);
-    // break sparks: short, fast white/gold crack at the instant the shell bursts
-    if(this.comet){const n=high()?60:30;for(let i=0;i<n;i++){rdir();addSpark(x,y,z,R()<.5?COLOR.White:COLOR.Gold,D[0],D[1],D[2],this.spreadSize/60*(.6+R()*.8),150+R()*200)}}
-    // burst smoke: a billowing shell of many mid-size puffs that expands fast then slows, plus a denser core that lingers
-    if(this.comet){const sp=this.spreadSize,n=Math.min(22,10+(sp/45|0));addSmoke(x,y,z,n,sp*.16,sp/85,sp*.3);addSmoke(x,y,z,5,sp*.05,sp/260,sp*.38,1.2,.8)}
+    
     if(this.comet){const md=2,df=Math.min(md,shellSize()-this.shellSize);playSound('burst',(1-df/md)*.3+.7,delayOf(z))}}
 }
 
@@ -311,383 +289,7 @@ function update(dt){
     const burn=Math.sqrt(s.life/s.full),bi=1-burn;s.px=s.x;s.py=s.y;s.pz=s.z;
     if(s.path){const p=s.path,u=1-s.life/s.full,e=p.lin?u:1-Math.pow(1-u,1.8);s.spinA+=.8*speed;
       s.x=p.fx+(p.tx-p.fx)*e+Math.sin(s.spinA)*s.spin;s.y=p.fy+(p.ty-p.fy)*e+Math.cos(s.spinA)*s.spin;s.z=p.fz+(p.tz-p.fz)*e;
-      if(frame%2===0)addSmoke(s.x,s.y,s.z,1,4,.03,30,.3,.45)} // thin rocket-trail smoke, only visible once a burst lights it
-    else{s.vx+=wS;s.x+=s.vx*speed;s.y+=s.vy*speed;s.z+=s.vz*speed;const dr=s.heavy?sdh:sd;s.vx*=dr;s.vy*=dr;s.vz*=dr;s.vy-=g}
-    if(s.hist&&frame%2===0){if(!s.hx)s.hx=new Float32Array(H*3);const j=s.hi*3;s.hx[j]=s.x;s.hx[j+1]=s.y;s.hx[j+2]=s.z;s.hi=(s.hi+1)%H;if(s.hn<H)s.hn++}if(s.sf){s.st-=ts;while(s.st<0){s.st+=s.sf*.75+s.sf*bi*4;rdir();addSpark(s.x,s.y,s.z,s.sk,D[0],D[1],D[2],R()*s.ss*burn,s.sl*.8+R()*s.slv*s.sl)}}
-    if(s.life<s.trans){if(s.sc&&!s.changed){s.changed=true;s.c=s.sc;if(s.sc===INV)s.sf=0}
-      if(s.strobe)s.vis=Math.floor(s.life/s.sfq)%3===0}
-    const c=s.c;if(c!==INV){cnt++;sr+=c.r;sg+=c.g;sb+=c.b}
-    if(s.vis&&c!==INV){let r=c.r/255,gg=c.g/255,b=c.b/255;
-      // realistic burn: white-hot ignition -> true colour -> dim orange ember
-      const w=Math.max(0,1-bi*2.6)*.8,em=s.path?0:Math.max(0,(bi-.5)/.5),br=(1-em*.7)*(.65+R()*.35);
-      r+=(1-r)*w;gg+=(1-gg)*w;b+=(1-b)*w;r+=(1-r)*em*.4;gg+=(.4-gg)*em*.5;b+=(.1-b)*em*.6;r*=br;gg*=br;b*=br;
-      PP[np*3]=s.x;PP[np*3+1]=s.y;PP[np*3+2]=s.z;PC[np*3]=r;PC[np*3+1]=gg;PC[np*3+2]=b;np++;
-      if(s.hist&&s.hn>2)ribbon(s,r,gg,b);else{const tl=TL/speed;quad(s.x,s.y,s.z,s.x-(s.x-s.px)*tl,s.y-(s.y-s.py)*tl,s.z-(s.z-s.pz)*tl,r,gg,b,(s.path?1.5:1.1)*PR)}}
-    else if(s.hist&&s.vis&&c===INV&&s.hn>2&&s.sk!==INV){const k0=Math.sqrt(s.life/s.full)*.8,e=s.sk;ribbon(s,e.r/255*k0,e.g/255*k0,e.b/255*k0)}}
-  for(let i=anars.length-1;i>=0;i--){const a=anars[i];a.t-=ts;if(a.t<=0){anars.splice(i,1);continue}
-    for(let k=0;k<5;k++){const ang=R()*TAU,sp=.18+R()*.22;addSpark(a.x,a.y,a.z,R()<.3?COLOR.White:a.c,Math.cos(ang)*sp,1,Math.sin(ang)*sp,6+R()*7,350+R()*550)}}
-  for(let i=sparks.length-1;i>=0;i--){const s=sparks[i];s.life-=ts;
-    if(s.life<=0){sparks[i]=sparks[sparks.length-1];sparks.pop();sparkPool.push(s);continue}
-    s.px=s.x;s.py=s.y;s.pz=s.z;s.vx+=wK;s.x+=s.vx*speed;s.y+=s.vy*speed;s.z+=s.vz*speed;s.vx*=spd;s.vy*=spd;s.vz*=spd;s.vy-=g;
-    const c=s.c,k=.85*Math.min(1,s.life/s.full*2.2),tl=2.6;quad(s.x,s.y,s.z,s.x-(s.x-s.px)*tl,s.y-(s.y-s.py)*tl,s.z-(s.z-s.pz)*tl,c.r/255*k,c.g/255*k,c.b/255*k,.75*PR)}
-  for(let i=smoke.length-1;i>=0;i--){const m=smoke[i];m.life-=ts;if(m.life<=0){smoke[i]=smoke[smoke.length-1];smoke.pop()}}
-  for(let i=lights.length-1;i>=0;i--){const L=lights[i];L.life-=ts;if(L.life<=0){lights[i]=lights[lights.length-1];lights.pop()}}
-  for(let i=0;i<smoke.length;i++){const m=smoke[i],u=m.life/m.full;
-    m.x+=(m.vx+wind*.25)*speed;m.y+=m.vy*speed;m.z+=m.vz*speed;
-    const fr=Math.pow(.955,speed);m.vx*=fr;m.vz*=fr;m.vy*=Math.pow(.985,speed);   // burst push dies out quickly, then it just drifts
-    m.vx+=(R()-.5)*.012*speed;m.vy+=(R()-.5)*.006*speed;                          // turbulence
-    m.sz*=1+(.0006+.004*Math.pow(u,8))*speed;                                     // fast billow at first, slow spread later
-    let lr=.004+sky.r/90,lg_=.004+sky.g/90,lb=.005+sky.b/90;
-    for(let j=0;j<lights.length;j++){const L=lights[j],dx=m.x-L.x,dy=m.y-L.y,dz=m.z-L.z,f=L.i*Math.pow(L.life/L.full,1.6)*L.r*L.r/(dx*dx+dy*dy+dz*dz+L.r*L.r)*.85;lr+=L.cr*f;lg_+=L.cg*f;lb+=L.cb*f}
-    const fade=Math.min(1,(1-u)*10+.05)*Math.pow(u,.6)*m.a*.08;
-    MP[i*3]=m.x;MP[i*3+1]=m.y;MP[i*3+2]=m.z;MC[i*3]=lr*fade;MC[i*3+1]=lg_*fade;MC[i*3+2]=lb*fade;MS[i]=m.sz;MI[i*2]=m.seed;MI[i*2+1]=1-u}
-  mg.setDrawRange(0,smoke.length);['position','color','size','info'].forEach(n=>mg.attributes[n].needsUpdate=true);
-  // sky lighting: tint the background by the combined colour of all stars
-  if(cfg.sky){const maxSat=cfg.sky*15,inten=Math.pow(Math.min(1,cnt/500),.3),mx=Math.max(1,sr,sg,sb);
-    sky.r+=(sr/mx*maxSat*inten-sky.r)/10*speed;sky.g+=(sg/mx*maxSat*inten-sky.g)/10*speed;sky.b+=(sb/mx*maxSat*inten-sky.b)/10*speed}
-  else sky.r=sky.g=sky.b=0;
-  // ground glow: horizon lights up with the burst colours + flashes
-  {const m=Math.max(1,sky.r,sky.g,sky.b),cr=sky.r/m*255|0,cg=sky.g/m*255|0,cb=sky.b/m*255|0,a=Math.min(.6,m/(Math.max(1,cfg.sky)*15)*.4+glowB*.3);glowB*=Math.pow(.95,speed);
-    glowEl.style.background=`linear-gradient(to top,rgba(${cr},${cg},${cb},${a.toFixed(3)}),rgba(${cr},${cg},${cb},0))`}
-  fadeMat.color.setRGB(sky.r/255,sky.g/255,sky.b/255);fadeMat.opacity=cfg.shutter?.0025:Math.min(1,.2*speed);
-  pg.setDrawRange(0,np);lg.setDrawRange(0,nq*6);
-  pg.attributes.position.needsUpdate=pg.attributes.color.needsUpdate=true;['position','tail','color','aux'].forEach(n=>lg.attributes[n].needsUpdate=true);
-  camera.position.set((R()-.5)*shake*4,(R()-.5)*shake*4,0);shake*=Math.pow(.88,speed);renderer.render(FADE,ortho);renderer.render(scene,camera);
-  flashActive.forEach(s=>{scene.remove(s);flashPool.push(s)});flashActive=[]}
-let last=performance.now();
-function loop(now){requestAnimationFrame(loop);const dt=Math.min(now-last,48);last=now;if(running())update(dt)}
-requestAnimationFrame(loop);
-
-// ---------- UI
-const fill=(id,a)=>$(id).innerHTML=a.map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
-fill('o_shell',shellNames.map(n=>[n,n]));fill('o_size',['3"','4"','6"','8"','12"','16"'].map((l,i)=>[i,l]));fill('o_q',[[1,'Low'],[2,'Normal'],[3,'High']]);fill('o_sky',[[0,'None'],[1,'Dim'],[2,'Normal']]);
-function sync(){$('o_shell').value=cfg.shell;$('o_size').value=cfg.size;$('o_q').value=cfg.quality;$('o_sky').value=cfg.sky;$('o_auto').checked=cfg.auto;$('o_fin').checked=cfg.finale;$('o_hide').checked=cfg.hide;$('o_shut').checked=cfg.shutter;
-  $('bp').textContent=paused?'▶':'⏸';$('bs').textContent=soundOn?'🔊':'🔇';$('menu').classList.toggle('on',menuOpen);$('ctl').classList.toggle('off',cfg.hide||menuOpen)}
-const bind=(id,k,fn=v=>v,ev='input')=>$(id).addEventListener(ev,e=>{cfg[k]=fn(e.target.type==='checkbox'?e.target.checked:e.target.value);sync()});
-bind('o_shell','shell');bind('o_size','size',Number);bind('o_q','quality',Number);bind('o_sky','sky',Number);bind('o_auto','auto',v=>v,'change');bind('o_fin','finale',v=>v,'change');bind('o_hide','hide',v=>v,'change');bind('o_shut','shutter',v=>v,'change');
-$('bp').onclick=()=>{paused=!paused;sync()};$('bm').onclick=()=>{menuOpen=true;sync()};$('cl').onclick=()=>{menuOpen=false;sync()};
-$('bs').onclick=()=>{soundOn=!soundOn;if(soundOn){if(!AC)aInit();if(AC&&AC.state==='suspended')AC.resume()}sync()};
-addEventListener('keydown',e=>{if(e.keyCode===80){paused=!paused}else if(e.keyCode===79){menuOpen=!menuOpen}else if(e.keyCode===27){menuOpen=false}sync()});
-let pd0=false;cvs.addEventListener('pointerdown',e=>{if(!pd0){pd0=true;soundOn=true;if(!AC)aInit();if(AC&&AC.state==='suspended')AC.resume();sync()}if(!running())return;const z=-(1000+R()*400),d=new THREE.Vector3(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1,.5).unproject(camera).sub(camera.position).normalize(),t=Math.abs(z)/Math.max(.2,-d.z);
-  new Shell(shellFromConfig(shellSize())).launchAt(d.x*t,Math.max(250,d.y*t),d.z*t)});
-sync();
-</script>
-</body></html> -->
-
-
-
-<!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Happy Diwali – Fireworks 3D</title>
-<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Yatra+One&display=swap" rel="stylesheet">
-<style>
-:root{color-scheme:dark;--ui:rgba(255,255,255,.5)}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;background:#000;overflow:hidden;color:var(--ui);font-family:'Russo One',Arial,sans-serif;letter-spacing:.06em}
-canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
-#glow{position:fixed;left:0;right:0;bottom:0;height:40%;pointer-events:none;mix-blend-mode:screen}
-#sil{position:fixed;left:0;bottom:0;width:100%;height:6%;pointer-events:none;display:block}
-#ctl{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;display:flex;justify-content:space-between;transition:opacity .3s}
-#ctl.off{opacity:0;pointer-events:none}
-.b{width:50px;height:50px;border:0;background:none;color:#fff;font-size:22px;opacity:.2;cursor:pointer;transition:opacity .3s}
-.b:hover{opacity:.5}
-#menu{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center}
-#menu.on{display:flex}
-.in{width:100%;max-width:400px;padding:16px;max-height:100%;overflow:auto}
-h2{margin:0 0 14px;text-align:center;text-transform:uppercase;font-weight:400;font-size:2em}
-label{display:flex;align-items:center;margin:14px 0;text-transform:uppercase}
-label>span{width:50%;padding-right:12px;text-align:right}
-select{width:50%;height:30px;font:inherit;color:var(--ui);background:transparent;border:1px solid var(--ui)}
-select option{background:#000}
-input[type=checkbox]{width:26px;height:26px;margin:0;opacity:.6}
-#cl{display:block;margin:18px auto 0;font:inherit;color:#fff;background:rgba(255,255,255,.25);border:0;border-radius:2px;padding:6px 18px;text-transform:uppercase;cursor:pointer}
-#cl:hover{background:#09f}
-small{display:block;text-align:center;opacity:.7;margin-top:14px;font-size:.75em}
-#hd{position:fixed;left:0;right:0;top:11%;text-align:center;pointer-events:none;font-family:'Yatra One','Russo One',serif;color:#ffcf6b;text-shadow:0 0 18px rgba(255,150,30,.8),0 0 50px rgba(255,90,0,.5);opacity:0;animation:hd 9s ease-in-out 1.5s forwards}
-#hd b{display:block;font-weight:400;font-size:clamp(28px,6vw,64px);letter-spacing:.08em}#hd i{display:block;font-style:normal;font-size:clamp(14px,2.2vw,24px);margin-top:6px;opacity:.8}
-@keyframes hd{0%{opacity:0;transform:translateY(8px)}18%,70%{opacity:1;transform:none}100%{opacity:0}}
-#dy{position:fixed;left:0;right:0;bottom:0;height:14px;pointer-events:none}
-#dy u{position:absolute;bottom:2px;width:7px;height:9px;border-radius:50% 50% 40% 40%;background:radial-gradient(circle at 50% 70%,#fff4b0,#ffa317 45%,rgba(255,90,0,0) 75%);box-shadow:0 0 12px 4px rgba(255,140,20,.55);animation:fl 1.6s ease-in-out infinite alternate}
-@keyframes fl{from{opacity:.6;transform:scale(.9)}to{opacity:1;transform:scale(1.08)}}
-</style></head>
-<body>
-<canvas id="c"></canvas>
-<div id="glow"></div>
-<svg id="sil" viewBox="0 0 200 10" preserveAspectRatio="none"></svg><div id="hd"><b>शुभ दीपावली</b><i>Happy Diwali</i></div><div id="dy"></div>
-<div id="ctl"><button class="b" id="bp">⏸</button><button class="b" id="bs">🔇</button><button class="b" id="bm">⚙</button></div>
-<div id="menu"><div class="in"><h2>Settings</h2>
-<label><span>Shell Type</span><select id="o_shell"></select></label>
-<label><span>Shell Size</span><select id="o_size"></select></label>
-<label><span>Quality</span><select id="o_q"></select></label>
-<label><span>Sky Lighting</span><select id="o_sky"></select></label>
-<label><span>Auto Fire</span><input type="checkbox" id="o_auto"></label>
-<label><span>Finale Mode</span><input type="checkbox" id="o_fin"></label>
-<label><span>Hide Controls</span><input type="checkbox" id="o_hide"></label>
-<label><span>Open Shutter</span><input type="checkbox" id="o_shut"></label>
-<button id="cl">Close</button><small>Click / tap anywhere to fire a shell · P pause · O menu</small></div></div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-'use strict';
-// Realistic 3D fireworks (three.js).
-//  • white-hot -> colour -> orange ember colour curve on every star
-//  • gradient comet trails + sparks that fade out as they burn
-//  • soft bloom layer, twinkling night sky, tree-line silhouette
-//  • NEW: volumetric smoke - procedural turbulent (fbm) puffs that rotate, billow, erode into wisps,
-//    drift with the wind, get lit by each burst's colour and fall back into darkness
-//  • speed-of-sound delay: bang arrives after the flash, farther shells = longer delay
-const R=Math.random,TAU=Math.PI*2,rnd=(a,b)=>a+R()*(b-a),$=id=>document.getElementById(id);
-const IS_MOBILE=innerWidth<=640,HI=(navigator.hardwareConcurrency||0)>=(innerWidth<=1024?4:8);
-const cfg={quality:HI?3:2,shell:'Random',size:IS_MOBILE?2:3,auto:true,finale:false,sky:2,shutter:false,hide:false};
-let paused=false,soundOn=false,menuOpen=false;
-const QL=()=>+cfg.quality,low=()=>QL()===1,high=()=>QL()===3,running=()=>!paused&&!menuOpen;
-
-// ---------- colours
-const mk=(r,g,b)=>({r,g,b}),COLOR={Red:mk(255,0,67),Green:mk(20,252,86),Blue:mk(30,127,255),Purple:mk(230,10,255),Gold:mk(255,191,54),Orange:mk(255,105,15),Pink:mk(255,40,140),White:mk(255,255,255)},INV=mk(0,0,0),CODES=Object.values(COLOR);
-const WC=[COLOR.Gold,COLOR.Gold,COLOR.Gold,COLOR.Orange,COLOR.Orange,COLOR.Red,COLOR.Pink,COLOR.Green,COLOR.Blue,COLOR.Purple,COLOR.White],rc0=()=>WC[R()*WC.length|0];let lastColor;
-function randomColor(o={}){let c=rc0();if(o.limitWhite&&c===COLOR.White&&R()<.6)c=rc0();
-  if(o.notSame)while(c===lastColor)c=rc0();else if(o.notColor)while(c===o.notColor)c=rc0();lastColor=c;return c}
-const whiteOrGold=()=>R()<.5?COLOR.Gold:COLOR.White,pistilFor=c=>(c===COLOR.White||c===COLOR.Gold)?randomColor({notColor:c}):whiteOrGold();
-
-// ---------- shell types
-const chrys=(s=1)=>{const glitter=R()<.6,single=R()<.72,color=single?randomColor({limitWhite:true}):[randomColor(),randomColor({notSame:true})],
-  pistil=single&&R()<.42,pc=pistil&&pistilFor(color),second=single&&(R()<.2||color===COLOR.White)?pc||randomColor({notColor:color,limitWhite:true}):null,
-  streamers=!pistil&&color!==COLOR.White&&R()<.42;let d=glitter?1.1:1.25;if(low())d*=.8;if(high())d=1.2;
-  return{shellSize:s,spreadSize:300+s*100,starLife:900+s*200,starDensity:d,color,secondColor:second,glitter:glitter?'light':'',glitterColor:whiteOrGold(),pistil,pistilColor:pc,streamers}};
-const ghost=(s=1)=>{const h=chrys(s);h.starLife*=1.5;const gc=randomColor({notColor:COLOR.White});h.streamers=true;h.color=INV;h.secondColor=gc;h.glitter='';return h};
-const strobe=(s=1)=>{const color=randomColor({limitWhite:true});return{shellSize:s,spreadSize:280+s*92,starLife:1100+s*200,starLifeVariation:.4,starDensity:1.1,color,glitter:'light',glitterColor:COLOR.White,strobe:true,strobeColor:R()<.5?COLOR.White:null,pistil:R()<.5,pistilColor:pistilFor(color)}};
-const palm=(s=1)=>{const thick=R()<.5;return{shellSize:s,color:randomColor(),spreadSize:250+s*75,starDensity:thick?.15:.4,starLife:1800+s*200,glitter:thick?'thick':'heavy'}};
-const ring=(s=1)=>{const color=randomColor(),pistil=R()<.75;return{shellSize:s,ring:true,color,spreadSize:300+s*100,starLife:900+s*200,starCount:2.2*TAU*(s+1),pistil,pistilColor:pistilFor(color),glitter:!pistil?'light':'',glitterColor:color===COLOR.Gold?COLOR.Gold:COLOR.White,streamers:R()<.3}};
-const crossette=(s=1)=>{const color=randomColor({limitWhite:true});return{shellSize:s,spreadSize:300+s*100,starLife:750+s*160,starLifeVariation:.4,starDensity:.85,color,crossette:true,pistil:R()<.5,pistilColor:pistilFor(color)}};
-const floral=(s=1)=>({shellSize:s,spreadSize:300+s*120,starDensity:.12,starLife:500+s*50,starLifeVariation:.5,color:R()<.65?'random':(R()<.15?randomColor():[randomColor(),randomColor({notSame:true})]),floral:true});
-const leaves=(s=1)=>({shellSize:s,color:INV,spreadSize:300+s*120,starDensity:.12,starLife:500+s*50,starLifeVariation:.5,glitter:'medium',glitterColor:COLOR.Gold,fallingLeaves:true});
-const willow=(s=1)=>({shellSize:s,spreadSize:300+s*100,starDensity:.6,starLife:3000+s*300,glitter:'willow',glitterColor:COLOR.Gold,color:INV});
-const crackle=(s=1)=>{const color=R()<.75?COLOR.Gold:randomColor();return{shellSize:s,spreadSize:380+s*75,starDensity:low()?.65:1,starLife:600+s*100,starLifeVariation:.32,glitter:'light',glitterColor:COLOR.Gold,color,crackle:true,pistil:R()<.65,pistilColor:pistilFor(color)}};
-const horsetail=(s=1)=>{const color=randomColor();return{shellSize:s,horsetail:true,color,spreadSize:250+s*38,starDensity:.9,starLife:2500+s*300,glitter:'medium',glitterColor:R()<.5?whiteOrGold():color,strobe:color===COLOR.White}};
-const randomShellName=()=>R()<.5?'Crysanthemum':shellNames[(R()*(shellNames.length-1)+1)|0];
-const shellTypes={'Random':s=>shellTypes[randomShellName()](s),'Crackle':crackle,'Crossette':crossette,'Crysanthemum':chrys,'Falling Leaves':leaves,'Floral':floral,'Ghost':ghost,'Horse Tail':horsetail,'Palm':palm,'Ring':ring,'Strobe':strobe,'Willow':willow};
-const shellNames=Object.keys(shellTypes),shellFromConfig=s=>shellTypes[cfg.shell](s),shellSize=()=>+cfg.size;
-const fastBlack=['Falling Leaves','Floral','Willow'];
-function randomFastShell(){const rnd_=cfg.shell==='Random';let n=rnd_?randomShellName():cfg.shell;if(rnd_)while(fastBlack.includes(n))n=randomShellName();return shellTypes[n]}
-
-// ---------- audio (synthesised). dl0 = extra delay in seconds (speed of sound)
-let AC,MG,NB,lastSmall=0;
-function aInit(){try{AC=new(window.AudioContext||window.webkitAudioContext)();MG=AC.createGain();MG.gain.value=.6;MG.connect(AC.destination);
-  const len=AC.sampleRate*2.5,ib=AC.createBuffer(2,len,AC.sampleRate);for(let c=0;c<2;c++){const d=ib.getChannelData(c);for(let i=0;i<len;i++)d[i]=(R()*2-1)*Math.pow(1-i/len,3)}
-  const cn=AC.createConvolver(),w=AC.createGain();cn.buffer=ib;w.gain.value=.4;MG.connect(cn);cn.connect(w);w.connect(AC.destination);
-  NB=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate);const d=NB.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=R()*2-1}catch(e){AC=null}}
-function nz(type,f0,f1,dur,vol,dl=0,q=1){if(!AC)return;const t=AC.currentTime+dl,s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();
-  s.buffer=NB;f.type=type;f.Q.value=q;f.frequency.setValueAtTime(f0,t);f.frequency.exponentialRampToValueAtTime(f1,t+dur);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(f);f.connect(g);g.connect(MG);s.start(t,R()*.3);s.stop(t+dur)}
-function tone(f0,f1,dur,vol,dl=0){if(!AC)return;const t=AC.currentTime+dl,o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+dur);
-  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(MG);o.start(t);o.stop(t+dur+.05)}
-function playSound(type,sc=1,dl0=0){if(!AC||!soundOn||!running())return;sc=Math.min(1,Math.max(0,sc));
-  if(type==='lift'){tone(120,40,.25,.3);nz('bandpass',500,2400,1.3,.12,.05,2)}
-  else if(type==='burst'){const d=.2+R()*.15+dl0;nz('lowpass',700,50,2,.9*sc,d);tone(95,28,.6,.7*sc,d);nz('highpass',1500,1501,.12,.25*sc,d)}
-  else if(type==='burstSmall'){const n=Date.now();if(n-lastSmall<20)return;lastSmall=n;nz('lowpass',1500,200,.25,.18,.15+dl0)}
-  else{const n=type==='crackle'?16:6;for(let i=0;i<n;i++)nz('highpass',4000,4001,.04,type==='crackle'?.18:.25,.15+dl0+R()*1.2)}}
-const delayOf=z=>Math.abs(z)/1800;
-
-// ---------- three.js scene
-const cvs=$('c'),renderer=new THREE.WebGLRenderer({canvas:cvs,antialias:false,preserveDrawingBuffer:true});
-renderer.autoClear=false;renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(42,1,10,6000),FADE=new THREE.Scene(),ortho=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
-const fadeMat=new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.175,depthTest:false,depthWrite:false});
-FADE.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),fadeMat));
-const glow=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d'),g=x.createRadialGradient(32,32,0,32,32,32);
-  g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.3,'rgba(255,255,255,.5)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,64,64);return new THREE.CanvasTexture(c)})();
-const flashTex=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),g=x.createRadialGradient(64,64,0,64,64,64);
-  g.addColorStop(.024,'rgba(255,255,255,1)');g.addColorStop(.125,'rgba(255,160,20,.2)');g.addColorStop(.32,'rgba(255,140,20,.11)');g.addColorStop(1,'rgba(255,120,20,0)');x.fillStyle=g;x.fillRect(0,0,128,128);return new THREE.CanvasTexture(c)})();
-// night-sky starfield (far away, dim, twinkles)
-const SN=240,SP=new Float32Array(SN*3),SC=new Float32Array(SN*3);
-for(let i=0;i<SN;i++){SP[i*3]=(R()*2-1)*3600;SP[i*3+1]=R()*3800;SP[i*3+2]=-5000-R()*400;const b=.06+Math.pow(R(),4)*.4,t=R();SC[i*3]=b*(.8+.2*t);SC[i*3+1]=b*.9;SC[i*3+2]=b*(1-.2*t)}
-const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.BufferAttribute(SP,3));sg.setAttribute('color',new THREE.BufferAttribute(SC,3));
-const skyStars=new THREE.Points(sg,new THREE.PointsMaterial({size:1.5,sizeAttenuation:false,vertexColors:true,transparent:true,opacity:.8,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending}));
-const CAPS=7000,CAPK=14000;
-const PP=new Float32Array(CAPS*3),PC=new Float32Array(CAPS*3);
-const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(PP,3).setUsage(THREE.DynamicDrawUsage));pg.setAttribute('color',new THREE.BufferAttribute(PC,3).setUsage(THREE.DynamicDrawUsage));
-const PR=Math.min(devicePixelRatio,2),CAPQ=CAPS+CAPK,QH=new Float32Array(CAPQ*12),QT=new Float32Array(CAPQ*12),QC=new Float32Array(CAPQ*12),QA=new Float32Array(CAPQ*12),QI=new Uint32Array(CAPQ*6);
-for(let i=0;i<CAPQ;i++){const v=i*4;QI.set([v,v+1,v+2,v+1,v+3,v+2],i*6);for(let k=0;k<4;k++){QA[(v+k)*3]=k%2?1:-1;QA[(v+k)*3+1]=k>1?1:0}}
-const lg=new THREE.BufferGeometry();
-[['position',QH],['tail',QT],['color',QC],['aux',QA]].forEach(([n,a])=>lg.setAttribute(n,new THREE.BufferAttribute(a,3).setUsage(THREE.DynamicDrawUsage)));
-lg.setIndex(new THREE.BufferAttribute(QI,1));
-let nq=0;
-function quad(x,y,z,tx,ty,tz,r,g,b,w,r2,g2,b2){if(nq>=CAPQ)return;const o=nq*12,e=r2!==undefined;for(let k=0;k<4;k++){const j=o+k*3,u=e&&k>1;QH[j]=x;QH[j+1]=y;QH[j+2]=z;QT[j]=tx;QT[j+1]=ty;QT[j+2]=tz;QC[j]=u?r2:r;QC[j+1]=u?g2:g;QC[j+2]=u?b2:b;QA[j+2]=w}nq++}
-// polyline trail through the star's recent positions; colour fades head->tail with no taper seams (negative width = no taper)
-function ribbon(s,r,g,b){const S=Math.min(s.hn,H-1),Q=6;let px=s.x,py=s.y,pz=s.z;
-  for(let q=0;q<Q;q++){const i=((s.hi-Math.round((q+1)*S/Q)+H*2)%H)*3,x=s.hx[i],y=s.hx[i+1],z=s.hx[i+2],k0=Math.pow(1-q/Q,1.4),k1=Math.pow(1-(q+1)/Q,1.4);
-    quad(px,py,pz,x,y,z,r*k0,g*k0,b*k0,-1.2*PR,r*k1,g*k1,b*k1);px=x;py=y;pz=z}}
-const rMat=new THREE.ShaderMaterial({uniforms:{uRes:{value:new THREE.Vector2(1,1)}},transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,
-  vertexShader:`attribute vec3 tail;attribute vec3 color;attribute vec3 aux;uniform vec2 uRes;varying vec3 vC;varying vec3 vA;
-void main(){vec4 a=projectionMatrix*modelViewMatrix*vec4(position,1.);vec4 b=projectionMatrix*modelViewMatrix*vec4(tail,1.);
-vec2 sa=a.xy/a.w*uRes*.5,sb=b.xy/b.w*uRes*.5,d=sb-sa;float L=length(d);vec2 dir=L>.001?d/L:vec2(0.,1.);L=max(L,2.);
-vec2 n=vec2(-dir.y,dir.x),p=sa+dir*L*aux.y+n*aux.x*abs(aux.z)*mix(1.,.2,aux.y*step(0.,aux.z));
-vC=color;vA=vec3(aux.xy,aux.z<0.?1.:0.);gl_Position=vec4(p/(uRes*.5),0.,1.);}`,
-  fragmentShader:`varying vec3 vC;varying vec3 vA;void main(){float t=1.-vA.y;gl_FragColor=vec4(vC*1.4,mix(t*t,1.,vA.z)*(1.-vA.x*vA.x));}`});
-const pmat=o=>new THREE.PointsMaterial({map:glow,size:10,vertexColors:true,transparent:true,opacity:o,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending});
-const pts=new THREE.Points(pg,pmat(1)),bloom=new THREE.Points(pg,pmat(.07)); // bloom = same particles, huge + faint
-const lines=new THREE.Mesh(lg,rMat);
-[skyStars,bloom,pts,lines].forEach(o=>{o.frustumCulled=false;scene.add(o)});
-const flashPool=[];let flashActive=[],glowB=0;
-const lights=[];let shake=0;
-function burstFlash(x,y,z,r,c){if(c!==undefined&&lights.length<24){c=Array.isArray(c)?c[0]:(c&&c!=='random'&&c!==INV?c:COLOR.Gold);lights.push({x,y,z,r:r*5,cr:c.r/255,cg:c.g/255,cb:c.b/255,i:Math.min(1.2,r/70),life:3500,full:3500});if(r>60)shake=Math.min(1,shake+r/260)}
-  const s=flashPool.pop()||new THREE.Sprite(new THREE.SpriteMaterial({map:flashTex,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending}));
-  s.position.set(x,y,z);const fr_=Math.min(r*1.6,200);s.scale.set(fr_,fr_,1);scene.add(s);flashActive.push(s);glowB=Math.min(.7,glowB+r/1600)}
-
-// ---------- volumetric smoke
-// Each puff is a camera-facing sprite whose shape is generated in the fragment shader from rotated fractal noise.
-// As a puff ages the noise threshold rises, so it erodes into thin wisps instead of fading as a blurry blob.
-const CAPM=1800,MP=new Float32Array(CAPM*3),MC=new Float32Array(CAPM*3),MS=new Float32Array(CAPM),MI=new Float32Array(CAPM*2),smoke=[];
-const mg=new THREE.BufferGeometry();
-[['position',MP,3],['color',MC,3],['size',MS,1],['info',MI,2]].forEach(([n,a,k])=>mg.setAttribute(n,new THREE.BufferAttribute(a,k).setUsage(THREE.DynamicDrawUsage)));
-const smokeMat=new THREE.ShaderMaterial({uniforms:{uS:{value:1}},transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,
-  vertexShader:`attribute float size;attribute vec3 color;attribute vec2 info;varying vec3 vC;varying vec2 vI;uniform float uS;
-void main(){vC=color;vI=info;vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=min(size*uS/-mv.z,900.);gl_Position=projectionMatrix*mv;}`,
-  fragmentShader:`varying vec3 vC;varying vec2 vI;
-float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x),f.y);}
-float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p=p*2.03+vec2(17.,9.);a*=.5;}return v;}
-void main(){
-  vec2 q=gl_PointCoord*2.-1.;float ang=vI.x*6.2832+vI.y*.6,s=sin(ang),c=cos(ang);q=mat2(c,-s,s,c)*q;
-  float r=length(q);
-  vec2 w=vec2(fbm(q*1.6+vI.x*31.),fbm(q*1.6+vI.x*17.+5.2));         // domain warp -> billowy curls
-  float d=fbm(q*2.1+(w-.5)*1.3+vI.x*53.+vI.y*.35);
-  float edge=smoothstep(1.,.25,r+(d-.5)*.55);
-  float th=vI.y*.5;                                                  // erosion grows with age
-  float a=smoothstep(th,th+.32,d)*edge;
-  float lit=.45+.9*d;                                                // dense core catches more light
-  gl_FragColor=vec4(vC*lit,a);
-}`});
-const smokePts=new THREE.Points(mg,smokeMat);smokePts.frustumCulled=false;scene.add(smokePts);
-// n puffs scattered inside radius rad, drifting outward at speed out; sz = puff diameter; lf = life scale; a = opacity scale
-function addSmoke(x,y,z,n,rad,out,sz,lf=1,a=1){for(let i=0;i<n&&smoke.length<CAPM;i++){rdir();const l=(7000+R()*6000)*lf,k=Math.pow(R(),.6);
-  smoke.push({x:x+D[0]*rad*k,y:y+D[1]*rad*k*.8,z:z+D[2]*rad*k,sz:sz*(.5+R()*.8),life:l,full:l,vx:D[0]*out*(.4+R()*.6)+(R()-.5)*.04,vy:D[1]*out*.7+.015+R()*.03,vz:D[2]*out*(.4+R()*.6),a:(.6+R()*.5)*a,seed:R()})}}
-
-let aspect=1,FOV=42,TOP=38;
-function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);aspect=w/h;FOV=aspect<.8?62:42;camera.fov=FOV;camera.aspect=aspect;
-  const pitch=FOV/2-4;camera.rotation.set(pitch*Math.PI/180,0,0);TOP=pitch+FOV/2;camera.updateProjectionMatrix();
-  pts.material.size=3*2*1300/h*(FOV/42);bloom.material.size=pts.material.size*4;smokeMat.uniforms.uS.value=renderer.domElement.height/(2*Math.tan(FOV*Math.PI/360));rMat.uniforms.uRes.value.set(renderer.domElement.width,renderer.domElement.height);
-  renderer.setClearColor(0x000000,1);renderer.clear()}
-addEventListener('resize',resize);resize();
-// where a (screen-fraction h, height v) launch lands in 3D at depth z
-function place(h,v,z){const az=Math.abs(z),hw=Math.tan(FOV*Math.PI/360)*aspect*az,f=.45+v*.5,e=(-4+f*(TOP+4))*Math.PI/180;return[(h*2-1)*hw*.88,az*Math.tan(e)]}
-const rz=()=>-(950+R()*750);
-
-(()=>{const d=$('dy');for(let i=0;i<46;i++){const u=document.createElement('u');u.style.left=(i*2.2+R()*1.2+1)+'%';u.style.animationDelay=(-R()*2)+'s';u.style.animationDuration=(1.2+R()*1.2)+'s';d.appendChild(u)}})();
-// tree-line silhouette
-(()=>{let d='M0 10',h=4;for(let i=0;i<=200;i+=1.6){h+=(R()-.5)*2.2;h=Math.max(2.2,Math.min(6.5,h));const spike=R()<.35?R()*2.2:0;d+=` L${i.toFixed(1)} ${(10-h-spike).toFixed(2)} L${(i+.8).toFixed(1)} ${(10-h+.6).toFixed(2)}`}
-  $('sil').innerHTML=`<path d="${d} L200 10 Z" fill="#000"/>`})();
-
-// ---------- particles
-const H=20,TL=9,GRAV=.9,stars=[],sparks=[],starPool=[],sparkPool=[],D=[0,0,0];
-let wind=0,windT=R()*100;
-function rdir(){const z=2*R()-1,a=R()*TAU,r=Math.sqrt(1-z*z);D[0]=r*Math.cos(a);D[1]=z;D[2]=r*Math.sin(a);return D}
-function addStar(x,y,z,c,dx,dy,dz,sp,life,ox=0,oy=0,oz=0){const s=starPool.pop()||{};s.x=s.px=x;s.y=s.py=y;s.z=s.pz=z;s.vx=dx*sp+ox;s.vy=dy*sp+oy;s.vz=dz*sp+oz;s.life=s.full=life;s.c=c;s.sk=c;
-  s.sf=0;s.ss=1;s.st=0;s.sl=750;s.slv=.25;s.strobe=false;s.vis=true;s.sc=null;s.trans=0;s.changed=false;s.death=null;s.path=null;s.spin=0;s.spinA=R()*TAU;s.sfq=50;s.hist=false;s.hn=0;s.hi=0;
-  if(stars.length<CAPS)stars.push(s);return s}
-function addSpark(x,y,z,c,dx,dy,dz,sp,life){if(sparks.length>=CAPK)return;const s=sparkPool.pop()||{};s.x=s.px=x;s.y=s.py=y;s.z=s.pz=z;s.vx=dx*sp;s.vy=dy*sp;s.vz=dz*sp;s.life=s.full=life;s.c=c;sparks.push(s)}
-const _q=new THREE.Quaternion(),_v=new THREE.Vector3(),_a=new THREE.Vector3();
-// evenly spread n directions over a randomly rotated sphere
-function sphere(n,cb){n=Math.max(1,Math.round(n));_a.set(R()-.5,R()-.5,R()-.5).normalize();_q.setFromAxisAngle(_a,R()*TAU);const off=R()*TAU;
-  for(let i=0;i<n;i++){const y=1-2*(i+.5)/n,r=Math.sqrt(1-y*y),t=i*2.39996323+off;_v.set(Math.cos(t)*r,y,Math.sin(t)*r).applyQuaternion(_q);
-    _v.x+=(R()-.5)*.24;_v.y+=(R()-.5)*.24;_v.z+=(R()-.5)*.24;_v.normalize();cb(_v.x,_v.y,_v.z)}}
-
-// star death effects
-function crossetteFx(s){sphere(4,(dx,dy,dz)=>addStar(s.x,s.y,s.z,s.c,dx,dy,dz,R()*.6+.75,600))}
-function floralFx(s){sphere(12+6*QL(),(dx,dy,dz)=>addStar(s.x,s.y,s.z,s.c,dx,dy,dz,2.4,1000+R()*300,s.vx,s.vy,s.vz));burstFlash(s.x,s.y,s.z,46);playSound('burstSmall',1,delayOf(s.z))}
-function leavesFx(s){sphere(7,(dx,dy,dz)=>{const n=addStar(s.x,s.y,s.z,INV,dx,dy,dz,2.4,2400+R()*600,s.vx,s.vy,s.vz);n.sk=COLOR.Gold;n.sf=144/QL();n.ss=.28;n.sl=750;n.slv=3.2});burstFlash(s.x,s.y,s.z,46);playSound('burstSmall',1,delayOf(s.z))}
-function crackleFx(s){const n=high()?32:16;for(let i=0;i<n;i++){rdir();addSpark(s.x,s.y,s.z,COLOR.Gold,D[0],D[1],D[2],Math.pow(R(),.45)*2.4,300+R()*200)}}
-const GL={light:[400,.3,300,2],medium:[200,.44,700,2],heavy:[80,.8,1400,2],thick:[16,1.5,1400,3],streamer:[32,1.05,620,2],willow:[120,.34,1400,3.8]};
-
-class Shell{
-  constructor(o){Object.assign(this,o);this.starLifeVariation=o.starLifeVariation||.22;this.color=o.color||randomColor();this.glitterColor=o.glitterColor||this.color;
-    if(!this.starCount){const d=o.starDensity||1,sc=this.spreadSize/54;this.starCount=Math.max(6,sc*sc*d)}}
-  launch(h,v,z=rz()){const p=place(h,v,z);this.launchAt(p[0],p[1],z)}
-  launchAt(x,y,z){const y0=-Math.abs(z)*.045,dist=y-y0,col=(this.color&&!Array.isArray(this.color)&&this.color!=='random')?this.color:COLOR.White,ht=this.horsetail,
-      dur=ht?700+dist*.6:900+dist*1.3,c=this.comet=addStar(x,y0,z,col,0,1,0,0,dur);
-    c.path={fx:x,fy:y0,fz:z,tx:x,ty:y,tz:z,lin:ht};c.spin=rnd(.32,.85)*8;if(ht)c.vy=dist/(dur/16.667);
-    c.sf=high()?8:32/QL();c.sl=320;c.slv=3;
-    if(this.glitter==='willow'||this.fallingLeaves){c.sf=20/QL();c.ss=.5;c.sl=500}
-    if(this.color===INV)c.sk=COLOR.Gold;
-    if(R()>.4&&!ht){c.sc=INV;c.trans=Math.pow(R(),1.5)*700+500}
-    c.death=cm=>this.burst(cm.x,cm.y,cm.z);playSound('lift')}
-  burst(x,y,z){
-    const speed=this.spreadSize/88;let onDeath,sf,ss,sl,slv=.25,played=false,col;
-    if(this.crossette)onDeath=s=>{if(!played){playSound('crackleSmall',1,delayOf(s.z));played=true}crossetteFx(s)};
-    if(this.crackle)onDeath=s=>{if(!played){playSound('crackle',1,delayOf(s.z));played=true}crackleFx(s)};
-    if(this.floral)onDeath=floralFx;if(this.fallingLeaves)onDeath=leavesFx;
-    if(this.glitter){const g=GL[this.glitter];sf=g[0]/QL();ss=g[1];sl=g[2];slv=g[3];if(this.glitter==='thick'&&high())ss=1.65}
-    const std=this.spreadSize/1800,cm=this.comet,ox=this.horsetail&&cm?cm.vx:0,oy=this.horsetail&&cm?cm.vy:std,oz=this.horsetail&&cm?cm.vz:0;
-    const apply=s=>{if(this.starLife>=2000)s.hist=true;if(this.secondColor){s.trans=this.starLife*(R()*.05+.32);s.sc=this.secondColor}
-      if(this.strobe){s.trans=this.starLife*(R()*.08+.46);s.strobe=true;s.sfq=R()*20+40;if(this.strobeColor)s.sc=this.strobeColor}
-      s.death=onDeath;if(this.glitter){s.sf=sf;s.ss=ss;s.sl=sl;s.slv=slv;s.sk=this.glitterColor;s.st=R()*sf}};
-    const life=()=>this.starLife+R()*this.starLife*this.starLifeVariation;
-    const factory=(dx,dy,dz,c)=>apply(addStar(x,y,z,c||randomColor(),dx,dy,dz,speed*(.78+R()*.22),life(),ox,oy,oz));
-    if(!Array.isArray(this.color)){
-      col=this.color==='random'?null:this.color;
-      if(this.ring){const n=rdir().slice(),a0=[n[2],0,-n[0]],l=Math.hypot(a0[0],a0[2])||1,a=[a0[0]/l,0,a0[2]/l],b=[0,0,0];
-        b[0]=n[1]*a[2]-n[2]*a[1];b[1]=n[2]*a[0]-n[0]*a[2];b[2]=n[0]*a[1]-n[1]*a[0];const cnt=this.starCount;
-        for(let i=0;i<cnt;i++){const t=i/cnt*TAU,cs=Math.cos(t),sn=Math.sin(t);apply(addStar(x,y,z,col,a[0]*cs+b[0]*sn,a[1]*cs+b[1]*sn,a[2]*cs+b[2]*sn,speed,life()))}}
-      else sphere(this.starCount,(dx,dy,dz)=>factory(dx,dy,dz,col))}
-    else{const c0=this.color[0],c1=this.color[1];
-      if(R()<.5){const n=rdir().slice();sphere(this.starCount,(dx,dy,dz)=>factory(dx,dy,dz,dx*n[0]+dy*n[1]+dz*n[2]>0?c0:c1))}
-      else sphere(this.starCount,(dx,dy,dz)=>factory(dx,dy,dz,R()<.5?c0:c1))}
-    if(this.pistil)new Shell({spreadSize:this.spreadSize*.5,starLife:this.starLife*.6,starLifeVariation:this.starLifeVariation,starDensity:1.4,color:this.pistilColor,glitter:'light',glitterColor:this.pistilColor===COLOR.Gold?COLOR.Gold:COLOR.White}).burst(x,y,z);
-    if(this.streamers)new Shell({spreadSize:this.spreadSize*.9,starLife:this.starLife*.8,starLifeVariation:this.starLifeVariation,starCount:Math.floor(Math.max(6,this.spreadSize/45)),color:COLOR.White,glitter:'streamer'}).burst(x,y,z);
-    burstFlash(x,y,z,this.spreadSize/4,this.comet?this.color:undefined);
-    // burst smoke: a billowing shell of many mid-size puffs that expands fast then slows, plus a denser core that lingers
-    if(this.comet){const sp=this.spreadSize,n=Math.min(22,10+(sp/45|0));addSmoke(x,y,z,n,sp*.16,sp/85,sp*.3);addSmoke(x,y,z,5,sp*.05,sp/260,sp*.38,1.2,.8)}
-    if(this.comet){const md=2,df=Math.min(md,shellSize()-this.shellSize);playSound('burst',(1-df/md)*.3+.7,delayOf(z))}}
-}
-
-// ---------- sequences (ported)
-function getRandomShellSize(){const base=shellSize(),mv=Math.min(2.5,base),v=R()*mv,size=base-v,height=mv===0?R():1-v/mv,co=R()*(1-height*.65)*.5,x=R()<.5?.5-co:.5+co;
-  return{size,x:(1-.36)*x+.18,height:height*.75}}
-function seqRandomShell(){const s=getRandomShellSize(),sh=new Shell(shellFromConfig(s.size));sh.launch(s.x,s.height);return 900+R()*600+(sh.fallingLeaves?4600:sh.starLife)}
-function seqRandomFastShell(){const t=randomFastShell(),s=getRandomShellSize(),sh=new Shell(t(s.size));sh.launch(s.x,s.height);return 900+R()*600+sh.starLife}
-function seqTwoRandom(){const a=getRandomShellSize(),b=getRandomShellSize(),s1=new Shell(shellFromConfig(a.size)),s2=new Shell(shellFromConfig(b.size));
-  s1.launch(.3+R()*.2-.1,a.height);setTimeout(()=>s2.launch(.7+R()*.2-.1,b.height),100);
-  return 900+R()*600+((s1.fallingLeaves||s2.fallingLeaves)?4600:Math.max(s1.starLife,s2.starLife))}
-function seqTriple(){const t=randomFastShell(),base=shellSize(),small=Math.max(0,base-1.25),z=rz();new Shell(t(base)).launch(.5+R()*.08-.04,.7,z);
-  setTimeout(()=>new Shell(t(small)).launch(.2+R()*.08-.04,.1,z),1000+R()*400);setTimeout(()=>new Shell(t(small)).launch(.8+R()*.08-.04,.1,z),1000+R()*400);return 4000}
-function seqPyramid(){const half=innerWidth>800?7:4,large=shellSize(),small=Math.max(0,large-3),main=R()<.78?chrys:ring,z=rz();
-  const go=(x,special)=>{const t=cfg.shell==='Random'?(special?shellTypes.Random:main):shellTypes[cfg.shell],h=x<=.5?x/.5:(1-x)/.5;new Shell(t(special?large:small)).launch(x,special?.75:h*.42,z)};
-  let count=0,delay=0;while(count<=half){if(count===half)setTimeout(()=>go(.5,true),delay);else{const o=count/half*.5;setTimeout(()=>go(o,false),delay);setTimeout(()=>go(1-o,false),delay+R()*30+30)}count++;delay+=200}
-  return 3400+half*250}
-function seqSmallBarrage(){seqSmallBarrage.last=Date.now();const n=innerWidth>800?11:5,si=innerWidth>800?3:1,size=Math.max(0,shellSize()-2),main=R()<.78?chrys:ring,spec=randomFastShell(),z=rz();
-  const go=(x,special)=>{const t=cfg.shell==='Random'?(special?spec:main):shellTypes[cfg.shell];new Shell(t(size)).launch(x,(Math.cos(x*5*Math.PI+Math.PI/2)+1)/2*.75,z)};
-  let count=0,delay=0;while(count<n){if(count===0){go(.5,false);count++}else{const o=(count+1)/n/2,sp=count===si;setTimeout(()=>go(.5+o,sp),delay);setTimeout(()=>go(.5-o,sp),delay+R()*30+30);count+=2}delay+=200}
-  return 3400+n*120}
-seqSmallBarrage.last=Date.now();
-const anars=[];
-function anar(){const z=rz(),p=place(.12+R()*.76,0,z),y=-Math.abs(z)*.045;anars.push({x:p[0],y,z,t:2200+R()*1800,c:R()<.5?COLOR.Gold:COLOR.Orange});return 4200}
-let firstSeq=true,finaleN=0;
-function startSequence(){
-  if(firstSeq){firstSeq=false;new Shell(chrys(shellSize())).launch(.5,.5);return 2400}
-  if(cfg.finale){seqRandomFastShell();if(finaleN<32){finaleN++;return 170}finaleN=0;return 6000}
-  const r=R();
-  if(r<.08&&Date.now()-seqSmallBarrage.last>15000)return seqSmallBarrage();
-  if(r<.1)return seqPyramid();if(r<.17)return anar();
-  if(r<.6)return seqRandomShell();
-  if(r<.8)return seqTwoRandom();
-  return seqTriple()}
-
-// ---------- simulation + render
-const sky={r:0,g:0,b:0},glowEl=$('glow');let autoT=0,frame=0;
-function update(dt){
-  const speed=dt/16.6667,ts=dt,sd=1-.02*speed,sdh=1-.008*speed,spd=1-.1*speed,g=ts/1000*GRAV;frame++;
-  windT+=ts/5000;wind=Math.sin(windT)*.6+Math.sin(windT*2.3+1)*.25;       // slowly shifting breeze
-  const wS=wind*.0035*speed,wK=wind*.02*speed;
-  skyStars.material.opacity=.65+.2*Math.sin(frame*.03)+.15*Math.sin(frame*.071); // gentle twinkle
-  if(cfg.auto){autoT-=ts;if(autoT<=0)autoT=startSequence()*.85}
-  nq=0;let np=0,cnt=0,sr=0,sg=0,sb=0;
-  for(let i=stars.length-1;i>=0;i--){const s=stars[i];s.life-=ts;
-    if(s.life<=0){stars[i]=stars[stars.length-1];stars.pop();const d=s.death;if(d)d(s);s.death=null;starPool.push(s);continue}
-    const burn=Math.sqrt(s.life/s.full),bi=1-burn;s.px=s.x;s.py=s.y;s.pz=s.z;
-    if(s.path){const p=s.path,u=1-s.life/s.full,e=p.lin?u:1-Math.pow(1-u,1.8);s.spinA+=.8*speed;
-      s.x=p.fx+(p.tx-p.fx)*e+Math.sin(s.spinA)*s.spin;s.y=p.fy+(p.ty-p.fy)*e+Math.cos(s.spinA)*s.spin;s.z=p.fz+(p.tz-p.fz)*e;
-      if(frame%2===0)addSmoke(s.x,s.y,s.z,1,4,.03,30,.3,.45)} // thin rocket-trail smoke, only visible once a burst lights it
+      }
     else{s.vx+=wS;s.x+=s.vx*speed;s.y+=s.vy*speed;s.z+=s.vz*speed;const dr=s.heavy?sdh:sd;s.vx*=dr;s.vy*=dr;s.vz*=dr;s.vy-=g}
     if(s.hist&&frame%2===0){if(!s.hx)s.hx=new Float32Array(H*3);const j=s.hi*3;s.hx[j]=s.x;s.hx[j+1]=s.y;s.hx[j+2]=s.z;s.hi=(s.hi+1)%H;if(s.hn<H)s.hn++}if(s.sf){s.st-=ts;while(s.st<0){s.st+=s.sf*.75+s.sf*bi*4;rdir();addSpark(s.x,s.y,s.z,s.sk,D[0],D[1],D[2],R()*s.ss*burn,s.sl*.8+R()*s.slv*s.sl)}}
     if(s.life<s.trans){if(s.sc&&!s.changed){s.changed=true;s.c=s.sc;if(s.sc===INV)s.sf=0}
@@ -706,29 +308,19 @@ function update(dt){
     if(s.life<=0){sparks[i]=sparks[sparks.length-1];sparks.pop();sparkPool.push(s);continue}
     s.px=s.x;s.py=s.y;s.pz=s.z;s.vx+=wK;s.x+=s.vx*speed;s.y+=s.vy*speed;s.z+=s.vz*speed;s.vx*=spd;s.vy*=spd;s.vz*=spd;s.vy-=g;
     const c=s.c,k=.85*Math.min(1,s.life/s.full*2.2),tl=2.6;quad(s.x,s.y,s.z,s.x-(s.x-s.px)*tl,s.y-(s.y-s.py)*tl,s.z-(s.z-s.pz)*tl,c.r/255*k,c.g/255*k,c.b/255*k,.75*PR)}
-  for(let i=smoke.length-1;i>=0;i--){const m=smoke[i];m.life-=ts;if(m.life<=0){smoke[i]=smoke[smoke.length-1];smoke.pop()}}
   for(let i=lights.length-1;i>=0;i--){const L=lights[i];L.life-=ts;if(L.life<=0){lights[i]=lights[lights.length-1];lights.pop()}}
-  for(let i=0;i<smoke.length;i++){const m=smoke[i],u=m.life/m.full;
-    m.x+=(m.vx+wind*.25)*speed;m.y+=m.vy*speed;m.z+=m.vz*speed;
-    const fr=Math.pow(.955,speed);m.vx*=fr;m.vz*=fr;m.vy*=Math.pow(.985,speed);   // burst push dies out quickly, then it just drifts
-    m.vx+=(R()-.5)*.012*speed;m.vy+=(R()-.5)*.006*speed;                          // turbulence
-    m.sz*=1+(.0006+.004*Math.pow(u,8))*speed;                                     // fast billow at first, slow spread later
-    let lr=.004+sky.r/90,lg_=.004+sky.g/90,lb=.005+sky.b/90;
-    for(let j=0;j<lights.length;j++){const L=lights[j],dx=m.x-L.x,dy=m.y-L.y,dz=m.z-L.z,f=L.i*Math.pow(L.life/L.full,1.6)*L.r*L.r/(dx*dx+dy*dy+dz*dz+L.r*L.r)*.6;lr+=L.cr*f;lg_+=L.cg*f;lb+=L.cb*f}
-    lr=Math.min(lr,1.2);lg_=Math.min(lg_,1.2);lb=Math.min(lb,1.2);const fade=Math.min(1,(1-u)*10+.05)*Math.pow(u,.6)*m.a*.11;
-    MP[i*3]=m.x;MP[i*3+1]=m.y;MP[i*3+2]=m.z;MC[i*3]=lr*fade;MC[i*3+1]=lg_*fade;MC[i*3+2]=lb*fade;MS[i]=m.sz;MI[i*2]=m.seed;MI[i*2+1]=1-u}
-  mg.setDrawRange(0,smoke.length);['position','color','size','info'].forEach(n=>mg.attributes[n].needsUpdate=true);
   // sky lighting: tint the background by the combined colour of all stars
-  if(cfg.sky){const maxSat=cfg.sky*11,inten=Math.pow(Math.min(1,cnt/500),.3),mx=Math.max(1,sr,sg,sb);
+  if(cfg.sky){const maxSat=cfg.sky*6,inten=Math.pow(Math.min(1,cnt/500),.3),mx=Math.max(1,sr,sg,sb);
     sky.r+=(sr/mx*maxSat*inten-sky.r)/10*speed;sky.g+=(sg/mx*maxSat*inten-sky.g)/10*speed;sky.b+=(sb/mx*maxSat*inten-sky.b)/10*speed}
   else sky.r=sky.g=sky.b=0;
   // ground glow: horizon lights up with the burst colours + flashes
-  {const m=Math.max(1,sky.r,sky.g,sky.b),cr=sky.r/m*255|0,cg=sky.g/m*255|0,cb=sky.b/m*255|0,a=Math.min(.32,m/(Math.max(1,cfg.sky)*15)*.4+glowB*.15);glowB*=Math.pow(.95,speed);
+  {const m=Math.max(1,sky.r,sky.g,sky.b),cr=sky.r/m*255|0,cg=sky.g/m*255|0,cb=sky.b/m*255|0,a=Math.min(.14,m/(Math.max(1,cfg.sky)*15)*.25+glowB*.08);glowB*=Math.pow(.95,speed);
     glowEl.style.background=`linear-gradient(to top,rgba(${cr},${cg},${cb},${a.toFixed(3)}),rgba(${cr},${cg},${cb},0))`}
   fadeMat.color.setRGB(sky.r/255,sky.g/255,sky.b/255);fadeMat.opacity=cfg.shutter?.0025:Math.min(1,.2*speed);
   pg.setDrawRange(0,np);lg.setDrawRange(0,nq*6);
   pg.attributes.position.needsUpdate=pg.attributes.color.needsUpdate=true;['position','tail','color','aux'].forEach(n=>lg.attributes[n].needsUpdate=true);
-  camera.position.set((R()-.5)*shake*4,(R()-.5)*shake*4,0);shake*=Math.pow(.88,speed);renderer.render(FADE,ortho);renderer.render(scene,camera);
+  const sw=Math.sin(frame*.004),kx=innerHeight/900;camera.position.set(sw*30+(R()-.5)*shake*4,Math.sin(frame*.0031)*8+(R()-.5)*shake*4,0);
+  LY[0].style.transform=`translateX(${(-sw*9*kx).toFixed(2)}px)`;LY[1].style.transform=`translateX(${(-sw*14*kx).toFixed(2)}px)`;LY[2].style.transform=`translateX(${(-sw*23*kx).toFixed(2)}px)`;shake*=Math.pow(.88,speed);renderer.render(FADE,ortho);renderer.render(scene,camera);
   flashActive.forEach(s=>{scene.remove(s);flashPool.push(s)});flashActive=[]}
 let last=performance.now();
 function loop(now){requestAnimationFrame(loop);const dt=Math.min(now-last,48);last=now;if(running())update(dt)}
