@@ -75,7 +75,7 @@ const whiteOrGold=()=>R()<.5?COLOR.Gold:COLOR.White,pistilFor=c=>(c===COLOR.Whit
 // ---------- shell types
 const chrys=(s=1)=>{const glitter=R()<.6,single=R()<.72,color=single?randomColor({limitWhite:true}):[randomColor(),randomColor({notSame:true})],
   pistil=single&&R()<.42,pc=pistil&&pistilFor(color),second=single&&(R()<.2||color===COLOR.White)?pc||randomColor({notColor:color,limitWhite:true}):null,
-  streamers=!pistil&&color!==COLOR.White&&R()<.42;let d=glitter?1.1:1.25;if(low())d*=.8;if(high())d=1.2;
+  streamers=!pistil&&color!==COLOR.White&&R()<.42;let d=glitter?1.4:1.6;if(low())d*=.8;if(high())d=1.5;
   return{shellSize:s,spreadSize:300+s*100,starLife:900+s*200,starDensity:d,color,secondColor:second,glitter:glitter?'light':'',glitterColor:whiteOrGold(),pistil,pistilColor:pc,streamers}};
 const ghost=(s=1)=>{const h=chrys(s);h.starLife*=1.5;const gc=randomColor({notColor:COLOR.White});h.streamers=true;h.color=INV;h.secondColor=gc;h.glitter='';return h};
 const strobe=(s=1)=>{const color=randomColor({limitWhite:true});return{shellSize:s,spreadSize:280+s*92,starLife:1100+s*200,starLifeVariation:.4,starDensity:1.1,color,glitter:'light',glitterColor:COLOR.White,strobe:true,strobeColor:R()<.5?COLOR.White:null,pistil:R()<.5,pistilColor:pistilFor(color)}};
@@ -87,8 +87,12 @@ const leaves=(s=1)=>({shellSize:s,color:INV,spreadSize:300+s*120,starDensity:.12
 const willow=(s=1)=>({shellSize:s,spreadSize:300+s*100,starDensity:.6,starLife:3000+s*300,glitter:'willow',glitterColor:COLOR.Gold,color:INV});
 const crackle=(s=1)=>{const color=R()<.75?COLOR.Gold:randomColor();return{shellSize:s,spreadSize:380+s*75,starDensity:low()?.65:1,starLife:600+s*100,starLifeVariation:.32,glitter:'light',glitterColor:COLOR.Gold,color,crackle:true,pistil:R()<.65,pistilColor:pistilFor(color)}};
 const horsetail=(s=1)=>{const color=randomColor();return{shellSize:s,horsetail:true,color,spreadSize:250+s*38,starDensity:.9,starLife:2500+s*300,glitter:'medium',glitterColor:R()<.5?whiteOrGold():color,strobe:color===COLOR.White}};
+// swirl: every star keeps curving the same way, so the burst unwinds as a spiral / pinwheel
+const swirl=(s=1)=>{const color=randomColor({limitWhite:true});return{shellSize:s,spreadSize:300+s*100,starLife:1500+s*200,starDensity:.9,color,secondColor:R()<.5?randomColor({notColor:color,limitWhite:true}):null,glitter:'light',glitterColor:whiteOrGold(),swirl:(R()<.5?1:-1)*(.05+R()*.025),pistil:R()<.5,pistilColor:pistilFor(color)}};
+// heart: stars fly out along a heart curve facing the viewer
+const heart=(s=1)=>({shellSize:s,heart:true,color:R()<.6?COLOR.Red:COLOR.Pink,spreadSize:260+s*70,starLife:1300+s*150,starCount:90+s*20,glitter:'light',glitterColor:COLOR.White});
 const randomShellName=()=>R()<.5?'Crysanthemum':shellNames[(R()*(shellNames.length-1)+1)|0];
-const shellTypes={'Random':s=>shellTypes[randomShellName()](s),'Crackle':crackle,'Crossette':crossette,'Crysanthemum':chrys,'Falling Leaves':leaves,'Floral':floral,'Ghost':ghost,'Horse Tail':horsetail,'Palm':palm,'Ring':ring,'Strobe':strobe,'Willow':willow};
+const shellTypes={'Random':s=>shellTypes[randomShellName()](s),'Crackle':crackle,'Crossette':crossette,'Crysanthemum':chrys,'Falling Leaves':leaves,'Floral':floral,'Ghost':ghost,'Horse Tail':horsetail,'Palm':palm,'Ring':ring,'Strobe':strobe,'Swirl':swirl,'Heart':heart,'Willow':willow};
 const shellNames=Object.keys(shellTypes),shellFromConfig=s=>shellTypes[cfg.shell](s),shellSize=()=>+cfg.size;
 const fastBlack=['Falling Leaves','Floral','Willow'];
 function randomFastShell(){const rnd_=cfg.shell==='Random';let n=rnd_?randomShellName():cfg.shell;if(rnd_)while(fastBlack.includes(n))n=randomShellName();return shellTypes[n]}
@@ -121,12 +125,13 @@ const glow=(()=>{const c=document.createElement('canvas');c.width=c.height=64;co
 const flashTex=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),g=x.createRadialGradient(64,64,0,64,64,64);
   g.addColorStop(.024,'rgba(255,255,255,1)');g.addColorStop(.125,'rgba(255,160,20,.2)');g.addColorStop(.32,'rgba(255,140,20,.11)');g.addColorStop(1,'rgba(255,120,20,0)');x.fillStyle=g;x.fillRect(0,0,128,128);return new THREE.CanvasTexture(c)})();
 // night-sky starfield (far away, dim, twinkles)
-// stars sit at many different depths (near ones are bigger/brighter and drift more when the camera sways = parallax), plus a faint Milky Way band
-const SN=1500,SP=new Float32Array(SN*3),SC=new Float32Array(SN*3);
-for(let i=0;i<SN;i++){let x,y,z,b;
-  if(i<650){z=-(1800+R()*3400);x=(R()*2-1)*-z*.8;y=-z*(R()*1.1-.05);b=.06+Math.pow(R(),4)*.4}
-  else{z=-(4600+R()*500);const u=(R()*2-1)*4600,v=(R()+R()+R()-1.5)*520,a=.5;x=u*Math.cos(a)-v*Math.sin(a);y=2300+u*Math.sin(a)+v*Math.cos(a);b=.03+R()*.1*Math.exp(-Math.abs(v)/350)}
-  const t=R();SP[i*3]=x;SP[i*3+1]=y;SP[i*3+2]=z;SC[i*3]=b*(.8+.2*t);SC[i*3+1]=b*.9;SC[i*3+2]=b*(1-.2*t)}
+// stars live on a big dome around the camera (depth 2200-5200 -> parallax) and the whole dome keeps turning round a celestial pole,
+// so every star moves in a slow circle, always in the same direction. Plus a faint Milky Way band.
+const SN=15000,SP=new Float32Array(SN*3),SC=new Float32Array(SN*3),POLE=new THREE.Vector3(.15,.6,-.78).normalize();let skyA=0;
+for(let i=0;i<SN;i++){let dx,dy,dz,rad,b;
+  if(i<12000){dy=2*R()-1;const a=R()*TAU,r=Math.sqrt(1-dy*dy);dx=r*Math.cos(a);dz=r*Math.sin(a);rad=2200+R()*3000;b=.06+Math.pow(R(),4)*.4}
+  else{const ph=R()*TAU,lat=(R()+R()+R()-1.5)*.16,bx=Math.cos(ph)*Math.cos(lat),by=Math.sin(lat),bz=Math.sin(ph)*Math.cos(lat),tl=.9;dx=bx;dy=by*Math.cos(tl)-bz*Math.sin(tl);dz=by*Math.sin(tl)+bz*Math.cos(tl);rad=4800;b=.03+R()*.11*Math.exp(-Math.abs(lat)/.08)}
+  const t=R();SP[i*3]=dx*rad;SP[i*3+1]=dy*rad;SP[i*3+2]=dz*rad;SC[i*3]=b*(.8+.2*t);SC[i*3+1]=b*.9;SC[i*3+2]=b*(1-.2*t)}
 const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.BufferAttribute(SP,3));sg.setAttribute('color',new THREE.BufferAttribute(SC,3));
 const skyStars=new THREE.Points(sg,new THREE.PointsMaterial({size:6,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.8,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending}));
 const CAPS=7000,CAPK=14000;
@@ -149,22 +154,22 @@ void main(){vec4 a=projectionMatrix*modelViewMatrix*vec4(position,1.);vec4 b=pro
 vec2 sa=a.xy/a.w*uRes*.5,sb=b.xy/b.w*uRes*.5,d=sb-sa;float L=length(d);vec2 dir=L>.001?d/L:vec2(0.,1.);L=max(L,2.);
 vec2 n=vec2(-dir.y,dir.x),p=sa+dir*L*aux.y+n*aux.x*abs(aux.z)*mix(1.,.2,aux.y*step(0.,aux.z));
 vC=color;vA=vec3(aux.xy,aux.z<0.?1.:0.);gl_Position=vec4(p/(uRes*.5),0.,1.);}`,
-  fragmentShader:`varying vec3 vC;varying vec3 vA;void main(){float t=1.-vA.y;gl_FragColor=vec4(vC*1.4,mix(t*t,1.,vA.z)*(1.-vA.x*vA.x));}`});
+  fragmentShader:`varying vec3 vC;varying vec3 vA;void main(){float t=1.-vA.y;gl_FragColor=vec4(vC*1.8,mix(t*t,1.,vA.z)*(1.-vA.x*vA.x));}`});
 const pmat=o=>new THREE.PointsMaterial({map:glow,size:10,vertexColors:true,transparent:true,opacity:o,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending});
-const pts=new THREE.Points(pg,pmat(1)),bloom=new THREE.Points(pg,pmat(.035)); // bloom = same particles, huge + faint
+const pts=new THREE.Points(pg,pmat(1)),bloom=new THREE.Points(pg,pmat(.08)); // bloom = same particles, huge + faint
 const lines=new THREE.Mesh(lg,rMat);
 [skyStars,bloom,pts,lines].forEach(o=>{o.frustumCulled=false;scene.add(o)});
 const flashPool=[];let flashActive=[],glowB=0;
 const lights=[];let shake=0;
 function burstFlash(x,y,z,r,c){if(c!==undefined&&lights.length<24){c=Array.isArray(c)?c[0]:(c&&c!=='random'&&c!==INV?c:COLOR.Gold);lights.push({x,y,z,r:r*5,cr:c.r/255,cg:c.g/255,cb:c.b/255,i:Math.min(.8,r/70),life:3500,full:3500});if(r>60)shake=Math.min(1,shake+r/260)}
   const s=flashPool.pop()||new THREE.Sprite(new THREE.SpriteMaterial({map:flashTex,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending}));
-  s.position.set(x,y,z);const fr_=Math.min(r*1.1,120);s.scale.set(fr_,fr_,1);s.material.opacity=.55;scene.add(s);flashActive.push(s);glowB=Math.min(.4,glowB+r/2600)}
+  s.position.set(x,y,z);const fr_=Math.min(r*1.3,150);s.scale.set(fr_,fr_,1);s.material.opacity=.7;scene.add(s);flashActive.push(s);glowB=Math.min(.4,glowB+r/2600)}
 
 
 let aspect=1,FOV=42,TOP=38;
 function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);aspect=w/h;FOV=aspect<.8?62:42;camera.fov=FOV;camera.aspect=aspect;
   const pitch=FOV/2-4;camera.rotation.set(pitch*Math.PI/180,0,0);TOP=pitch+FOV/2;camera.updateProjectionMatrix();
-  pts.material.size=3*2*1300/h*(FOV/42);skyStars.material.size=1.7*7000/h;bloom.material.size=pts.material.size*4;rMat.uniforms.uRes.value.set(renderer.domElement.width,renderer.domElement.height);
+  pts.material.size=3*2*1300/h*(FOV/42)*1.35;skyStars.material.size=1.7*7000/h;bloom.material.size=pts.material.size*4;rMat.uniforms.uRes.value.set(renderer.domElement.width,renderer.domElement.height);
   renderer.setClearColor(0x000000,1);renderer.clear()}
 addEventListener('resize',resize);resize();
 // where a (screen-fraction h, height v) launch lands in 3D at depth z
@@ -183,11 +188,11 @@ const LY=[$('l1'),$('l2'),$('sil')];
   $(id).innerHTML=`<defs><linearGradient id="g${n}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><path d="${d} L200 20 Z" fill="url(#g${n})"/>`});
 
 // ---------- particles
-const H=20,TL=12,GRAV=.9,stars=[],sparks=[],starPool=[],sparkPool=[],D=[0,0,0];
+const H=20,TL=10,GRAV=.9,stars=[],sparks=[],starPool=[],sparkPool=[],D=[0,0,0];
 let wind=0,windT=R()*100;
 function rdir(){const z=2*R()-1,a=R()*TAU,r=Math.sqrt(1-z*z);D[0]=r*Math.cos(a);D[1]=z;D[2]=r*Math.sin(a);return D}
 function addStar(x,y,z,c,dx,dy,dz,sp,life,ox=0,oy=0,oz=0){const s=starPool.pop()||{};s.x=s.px=x;s.y=s.py=y;s.z=s.pz=z;s.vx=dx*sp+ox;s.vy=dy*sp+oy;s.vz=dz*sp+oz;s.life=s.full=life;s.c=c;s.sk=c;
-  s.sf=0;s.ss=1;s.st=0;s.sl=750;s.slv=.25;s.strobe=false;s.vis=true;s.sc=null;s.trans=0;s.changed=false;s.death=null;s.path=null;s.spin=0;s.spinA=R()*TAU;s.sfq=50;s.hist=false;s.hn=0;s.hi=0;
+  s.sf=0;s.ss=1;s.st=0;s.sl=750;s.slv=.25;s.strobe=false;s.vis=true;s.sc=null;s.trans=0;s.changed=false;s.death=null;s.path=null;s.spin=0;s.spinA=R()*TAU;s.sfq=50;s.hist=false;s.hn=0;s.hi=0;s.sw=0;
   if(stars.length<CAPS)stars.push(s);return s}
 function addSpark(x,y,z,c,dx,dy,dz,sp,life){if(sparks.length>=CAPK)return;const s=sparkPool.pop()||{};s.x=s.px=x;s.y=s.py=y;s.z=s.pz=z;s.vx=dx*sp;s.vy=dy*sp;s.vz=dz*sp;s.life=s.full=life;s.c=c;sparks.push(s)}
 const _q=new THREE.Quaternion(),_v=new THREE.Vector3(),_a=new THREE.Vector3();
@@ -224,12 +229,12 @@ class Shell{
     const std=this.spreadSize/1800,cm=this.comet,ox=this.horsetail&&cm?cm.vx:0,oy=this.horsetail&&cm?cm.vy:std,oz=this.horsetail&&cm?cm.vz:0;
     const apply=s=>{if(this.starLife>=2000)s.hist=true;if(this.secondColor){s.trans=this.starLife*(R()*.05+.32);s.sc=this.secondColor}
       if(this.strobe){s.trans=this.starLife*(R()*.08+.46);s.strobe=true;s.sfq=R()*20+40;if(this.strobeColor)s.sc=this.strobeColor}
-      s.death=onDeath;if(this.glitter){s.sf=sf;s.ss=ss;s.sl=sl;s.slv=slv;s.sk=this.glitterColor;s.st=R()*sf}};
+      if(this.swirl)s.sw=this.swirl;s.death=onDeath;if(this.glitter){s.sf=sf;s.ss=ss;s.sl=sl;s.slv=slv;s.sk=this.glitterColor;s.st=R()*sf}};
     const life=()=>this.starLife+R()*this.starLife*this.starLifeVariation;
-    const factory=(dx,dy,dz,c)=>apply(addStar(x,y,z,c||randomColor(),dx,dy,dz,speed*(.7+R()*.3),life(),ox,oy,oz));
+    const factory=(dx,dy,dz,c)=>apply(addStar(x,y,z,c||randomColor(),dx,dy,dz,speed*(.78+R()*.22),life(),ox,oy,oz));
     if(!Array.isArray(this.color)){
       col=this.color==='random'?null:this.color;
-      if(this.ring){const n=rdir().slice(),a0=[n[2],0,-n[0]],l=Math.hypot(a0[0],a0[2])||1,a=[a0[0]/l,0,a0[2]/l],b=[0,0,0];
+      if(this.heart){const cnt=this.starCount;for(let i=0;i<cnt;i++){const t=i/cnt*TAU,hx=16*Math.pow(Math.sin(t),3)/17,hy=(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))/17+.08;apply(addStar(x,y,z,col,hx,hy,0,speed*.95,life()))}}else if(this.ring){const n=rdir().slice(),a0=[n[2],0,-n[0]],l=Math.hypot(a0[0],a0[2])||1,a=[a0[0]/l,0,a0[2]/l],b=[0,0,0];
         b[0]=n[1]*a[2]-n[2]*a[1];b[1]=n[2]*a[0]-n[0]*a[2];b[2]=n[0]*a[1]-n[1]*a[0];const cnt=this.starCount;
         for(let i=0;i<cnt;i++){const t=i/cnt*TAU,cs=Math.cos(t),sn=Math.sin(t);apply(addStar(x,y,z,col,a[0]*cs+b[0]*sn,a[1]*cs+b[1]*sn,a[2]*cs+b[2]*sn,speed,life()))}}
       else sphere(this.starCount,(dx,dy,dz)=>factory(dx,dy,dz,col))}
@@ -281,7 +286,7 @@ function update(dt){
   const speed=dt/16.6667,ts=dt,sd=1-.02*speed,sdh=1-.008*speed,spd=1-.1*speed,g=ts/1000*GRAV;frame++;
   windT+=ts/5000;wind=Math.sin(windT)*.6+Math.sin(windT*2.3+1)*.25;       // slowly shifting breeze
   const wS=wind*.0035*speed,wK=wind*.02*speed;
-  skyStars.material.opacity=.65+.2*Math.sin(frame*.03)+.15*Math.sin(frame*.071); // gentle twinkle
+  skyStars.material.opacity=.65+.2*Math.sin(frame*.03)+.15*Math.sin(frame*.071);skyA+=.00018*speed;skyStars.quaternion.setFromAxisAngle(POLE,skyA); // gentle twinkle
   if(cfg.auto){autoT-=ts;if(autoT<=0)autoT=startSequence()*.85}
   nq=0;let np=0,cnt=0,sr=0,sg=0,sb=0;
   for(let i=stars.length-1;i>=0;i--){const s=stars[i];s.life-=ts;
@@ -290,7 +295,7 @@ function update(dt){
     if(s.path){const p=s.path,u=1-s.life/s.full,e=p.lin?u:1-Math.pow(1-u,1.8);s.spinA+=.8*speed;
       s.x=p.fx+(p.tx-p.fx)*e+Math.sin(s.spinA)*s.spin;s.y=p.fy+(p.ty-p.fy)*e+Math.cos(s.spinA)*s.spin;s.z=p.fz+(p.tz-p.fz)*e;
       }
-    else{s.vx+=wS;s.x+=s.vx*speed;s.y+=s.vy*speed;s.z+=s.vz*speed;const dr=s.heavy?sdh:sd;s.vx*=dr;s.vy*=dr;s.vz*=dr;s.vy-=g}
+    else{if(s.sw){const c_=Math.cos(s.sw*speed),n_=Math.sin(s.sw*speed),t_=s.vx*c_-s.vy*n_;s.vy=s.vx*n_+s.vy*c_;s.vx=t_}s.vx+=wS;s.x+=s.vx*speed;s.y+=s.vy*speed;s.z+=s.vz*speed;const dr=s.heavy?sdh:sd;s.vx*=dr;s.vy*=dr;s.vz*=dr;s.vy-=g}
     if(s.hist&&frame%2===0){if(!s.hx)s.hx=new Float32Array(H*3);const j=s.hi*3;s.hx[j]=s.x;s.hx[j+1]=s.y;s.hx[j+2]=s.z;s.hi=(s.hi+1)%H;if(s.hn<H)s.hn++}if(s.sf){s.st-=ts;while(s.st<0){s.st+=s.sf*.75+s.sf*bi*4;rdir();addSpark(s.x,s.y,s.z,s.sk,D[0],D[1],D[2],R()*s.ss*burn,s.sl*.8+R()*s.slv*s.sl)}}
     if(s.life<s.trans){if(s.sc&&!s.changed){s.changed=true;s.c=s.sc;if(s.sc===INV)s.sf=0}
       if(s.strobe)s.vis=Math.floor(s.life/s.sfq)%3===0}
@@ -300,17 +305,17 @@ function update(dt){
       const w=Math.max(0,1-bi*3.5)*.5,em=s.path?0:Math.max(0,(bi-.55)/.45),br=(1-em*.55)*(.8+R()*.2);
       r+=(1-r)*w;gg+=(1-gg)*w;b+=(1-b)*w;r+=(1-r)*em*.4;gg+=(.4-gg)*em*.5;b+=(.1-b)*em*.6;r*=br;gg*=br;b*=br;
       PP[np*3]=s.x;PP[np*3+1]=s.y;PP[np*3+2]=s.z;PC[np*3]=r;PC[np*3+1]=gg;PC[np*3+2]=b;np++;
-      if(s.hist&&s.hn>2)ribbon(s,r,gg,b);else{const tl=TL/speed;quad(s.x,s.y,s.z,s.x-(s.x-s.px)*tl,s.y-(s.y-s.py)*tl,s.z-(s.z-s.pz)*tl,r,gg,b,(s.path?1.5:1.1)*PR)}}
+      if(s.hist&&s.hn>2)ribbon(s,r,gg,b);else{const tl=TL/speed;quad(s.x,s.y,s.z,s.x-(s.x-s.px)*tl,s.y-(s.y-s.py)*tl,s.z-(s.z-s.pz)*tl,r,gg,b,(s.path?1.8:1.5)*PR)}}
     else if(s.hist&&s.vis&&c===INV&&s.hn>2&&s.sk!==INV){const k0=Math.sqrt(s.life/s.full)*.8,e=s.sk;ribbon(s,e.r/255*k0,e.g/255*k0,e.b/255*k0)}}
   for(let i=anars.length-1;i>=0;i--){const a=anars[i];a.t-=ts;if(a.t<=0){anars.splice(i,1);continue}
     for(let k=0;k<5;k++){const ang=R()*TAU,sp=.18+R()*.22;addSpark(a.x,a.y,a.z,R()<.3?COLOR.White:a.c,Math.cos(ang)*sp,1,Math.sin(ang)*sp,6+R()*7,350+R()*550)}}
   for(let i=sparks.length-1;i>=0;i--){const s=sparks[i];s.life-=ts;
     if(s.life<=0){sparks[i]=sparks[sparks.length-1];sparks.pop();sparkPool.push(s);continue}
     s.px=s.x;s.py=s.y;s.pz=s.z;s.vx+=wK;s.x+=s.vx*speed;s.y+=s.vy*speed;s.z+=s.vz*speed;s.vx*=spd;s.vy*=spd;s.vz*=spd;s.vy-=g;
-    const c=s.c,k=.85*Math.min(1,s.life/s.full*2.2),tl=2.6;quad(s.x,s.y,s.z,s.x-(s.x-s.px)*tl,s.y-(s.y-s.py)*tl,s.z-(s.z-s.pz)*tl,c.r/255*k,c.g/255*k,c.b/255*k,.75*PR)}
+    const c=s.c,k=1*Math.min(1,s.life/s.full*2.2),tl=2.6;quad(s.x,s.y,s.z,s.x-(s.x-s.px)*tl,s.y-(s.y-s.py)*tl,s.z-(s.z-s.pz)*tl,c.r/255*k,c.g/255*k,c.b/255*k,.75*PR)}
   for(let i=lights.length-1;i>=0;i--){const L=lights[i];L.life-=ts;if(L.life<=0){lights[i]=lights[lights.length-1];lights.pop()}}
   // sky lighting: tint the background by the combined colour of all stars
-  if(cfg.sky){const maxSat=cfg.sky*6,inten=Math.pow(Math.min(1,cnt/500),.3),mx=Math.max(1,sr,sg,sb);
+  if(cfg.sky){const maxSat=cfg.sky*8,inten=Math.pow(Math.min(1,cnt/500),.3),mx=Math.max(1,sr,sg,sb);
     sky.r+=(sr/mx*maxSat*inten-sky.r)/10*speed;sky.g+=(sg/mx*maxSat*inten-sky.g)/10*speed;sky.b+=(sb/mx*maxSat*inten-sky.b)/10*speed}
   else sky.r=sky.g=sky.b=0;
   // ground glow: horizon lights up with the burst colours + flashes
@@ -319,8 +324,8 @@ function update(dt){
   fadeMat.color.setRGB(sky.r/255,sky.g/255,sky.b/255);fadeMat.opacity=cfg.shutter?.0025:Math.min(1,.2*speed);
   pg.setDrawRange(0,np);lg.setDrawRange(0,nq*6);
   pg.attributes.position.needsUpdate=pg.attributes.color.needsUpdate=true;['position','tail','color','aux'].forEach(n=>lg.attributes[n].needsUpdate=true);
-  const sw=Math.sin(frame*.004),kx=innerHeight/900;camera.position.set(sw*30+(R()-.5)*shake*4,Math.sin(frame*.0031)*8+(R()-.5)*shake*4,0);
-  LY[0].style.transform=`translateX(${(-sw*9*kx).toFixed(2)}px)`;LY[1].style.transform=`translateX(${(-sw*14*kx).toFixed(2)}px)`;LY[2].style.transform=`translateX(${(-sw*23*kx).toFixed(2)}px)`;shake*=Math.pow(.88,speed);renderer.render(FADE,ortho);renderer.render(scene,camera);
+  const sw=Math.sin(frame*.004),kx=innerHeight/900;camera.position.set(sw*16+(R()-.5)*shake*4,Math.sin(frame*.0031)*8+(R()-.5)*shake*4,0);
+  LY[0].style.transform=`translateX(${(-sw*5*kx).toFixed(2)}px)`;LY[1].style.transform=`translateX(${(-sw*7.5*kx).toFixed(2)}px)`;LY[2].style.transform=`translateX(${(-sw*12*kx).toFixed(2)}px)`;shake*=Math.pow(.88,speed);renderer.render(FADE,ortho);renderer.render(scene,camera);
   flashActive.forEach(s=>{scene.remove(s);flashPool.push(s)});flashActive=[]}
 let last=performance.now();
 function loop(now){requestAnimationFrame(loop);const dt=Math.min(now-last,48);last=now;if(running())update(dt)}
