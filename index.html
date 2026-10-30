@@ -12,6 +12,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
 #glow{position:fixed;left:0;right:0;bottom:0;height:40%;pointer-events:none;mix-blend-mode:screen}
 .ly{position:fixed;left:-4%;bottom:0;width:108%;pointer-events:none;display:block;will-change:transform}
 #l1{height:15%}#l2{height:10%}#sil{height:6%}
+#smk{pointer-events:none;mix-blend-mode:screen}
 #sk{position:fixed;inset:0;pointer-events:none;mix-blend-mode:screen;background:linear-gradient(to top,rgba(26,38,78,.55) 0%,rgba(12,18,42,.35) 22%,rgba(5,8,20,.2) 55%,rgba(0,0,0,0) 100%)}
 #ctl{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;display:flex;justify-content:space-between;transition:opacity .3s}
 #ctl.off{opacity:0;pointer-events:none}
@@ -37,6 +38,7 @@ small{display:block;text-align:center;opacity:.7;margin-top:14px;font-size:.75em
 </style></head>
 <body>
 <canvas id="c"></canvas>
+<canvas id="smk"></canvas>
 <div id="sk"></div>
 <svg class="ly" id="l1" viewBox="0 0 200 20" preserveAspectRatio="none"></svg>
 <svg class="ly" id="l2" viewBox="0 0 200 20" preserveAspectRatio="none"></svg>
@@ -150,14 +152,43 @@ const flashPool=[];let flashActive=[],glowB=0;
 const lights=[];let shake=0;
 function burstFlash(x,y,z,r,c){if(c!==undefined&&lights.length<24){c=Array.isArray(c)?c[0]:(c&&c!=='random'&&c!==INV?c:COLOR.Gold);lights.push({x,y,z,r:r*5,cr:c.r/255,cg:c.g/255,cb:c.b/255,i:Math.min(.8,r/70),life:3500,full:3500});if(r>60)shake=Math.min(1,shake+r/260)}
   const s=flashPool.pop()||new THREE.Sprite(new THREE.SpriteMaterial({map:flashTex,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending}));
-  s.position.set(x,y,z);const fr_=Math.min(r*1.9,240);s.scale.set(fr_,fr_,1);s.material.opacity=.9;scene.add(s);flashActive.push(s);glowB=Math.min(.4,glowB+r/2600)}
+  s.position.set(x,y,z);const fr_=Math.min(r*1.9,240);s.scale.set(fr_,fr_,1);s.material.opacity=.9;scene.add(s);flashActive.push(s);glowB=Math.min(.4,glowB+r/2600);smkLit=Math.min(1,smkLit+r/320)}
+
+// ---------- smoke (2D overlay, lit by the bursts)
+const smk=$('smk'),sx=smk.getContext('2d'),smokes=[],smokeTex=[],LC=mk(255,176,80);let smkLit=0;
+for(let t=0;t<4;t++){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');
+  for(let i=0;i<16;i++){const a=R()*TAU,d=Math.pow(R(),.7)*26,px=64+Math.cos(a)*d,py=64+Math.sin(a)*d,r=14+R()*20,g=x.createRadialGradient(px,py,0,px,py,r);
+    g.addColorStop(0,'rgba(255,255,255,.2)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,128,128)}
+  smokeTex.push(c)}
+function addSmoke(x,y,z,r,a,life,vx=0,vy=0,vz=0){const cap=(r>=50?210:140)*(low()?.5:1);if(smokes.length>=cap)return;
+  smokes.push({x,y,z,vx:vx+(R()-.5)*.08,vy:vy+.02+R()*.04,vz:vz+(R()-.5)*.08,r,a,life,full:life,t:smokeTex[R()*4|0]})}
+function smokeBurst(x,y,z,spread){const n=Math.round((low()?2:high()?6:4)*Math.min(1.6,spread/450)),rr=spread*.14;
+  for(let i=0;i<n;i++)addSmoke(x+(R()-.5)*rr*2,y+(R()-.5)*rr*2,z+(R()-.5)*rr*2,spread*(.16+R()*.14),.6,7000+R()*5000,(R()-.5)*.1,0)}
+function launchFx(x,y,z){burstFlash(x,y,z,22);
+  for(let i=0;i<14;i++)addSpark(x,y,z,R()<.4?COLOR.White:COLOR.Gold,(R()-.5)*.7,.4+R()*.9,(R()-.5)*.7,2+R()*5,250+R()*350);
+  for(let i=0;i<3;i++)addSmoke(x+(R()-.5)*20,y,z,26+R()*18,.5,5000+R()*2500,0,.03)}
+function drawSmoke(speed){const w=smk.width,h=smk.height;if(!w)return;camera.updateMatrixWorld();
+  sx.globalCompositeOperation='source-over';sx.clearRect(0,0,w,h);
+  const tf=Math.tan(FOV*Math.PI/360),hh=h/2;
+  for(let i=smokes.length-1;i>=0;i--){const p=smokes[i];p.life-=16.67*speed;
+    if(p.life<=0){smokes[i]=smokes[smokes.length-1];smokes.pop();continue}
+    p.x+=(p.vx+wind*.08)*speed;p.y+=p.vy*speed;p.z+=p.vz*speed;p.vy*=1-.002*speed;
+    const u=1-p.life/p.full,al=p.a*Math.min(1,u*10)*Math.min(1,(1-u)*2);if(al<.005)continue;
+    _v.set(p.x,p.y,p.z).project(camera);if(_v.z>1)continue;
+    const d=Math.max(100,-p.z),r=p.r*(1+u*1.3)*hh/(tf*d),X=(_v.x*.5+.5)*w,Y=(-_v.y*.5+.5)*h;
+    if(X<-r||X>w+r||Y<-r||Y>h+r)continue;
+    sx.globalAlpha=al;sx.drawImage(p.t,X-r,Y-r,r*2,r*2)}
+  sx.globalAlpha=1;sx.globalCompositeOperation='source-atop';sx.fillStyle='rgb(70,82,112)';sx.fillRect(0,0,w,h);
+  const m=Math.max(1,sky.r,sky.g,sky.b),ta=Math.min(.65,smkLit*.6+Math.min(.2,m/70));
+  sx.fillStyle=m>1.5?`rgba(${sky.r/m*255|0},${sky.g/m*255|0},${sky.b/m*255|0},${ta.toFixed(3)})`:`rgba(255,190,90,${(smkLit*.6).toFixed(3)})`;sx.fillRect(0,0,w,h);
+  smkLit*=Math.pow(.975,speed)}
 
 let aspect=1,FOV=42,TOP=38;
 function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);aspect=w/h;FOV=aspect<.8?62:42;camera.fov=FOV;camera.aspect=aspect;
   const pitch=FOV/2-4;camera.rotation.set(pitch*Math.PI/180,0,0);TOP=pitch+FOV/2;camera.updateProjectionMatrix();
   // REAL-LOOK CHANGE: smaller, crisper star heads (no more big soft "dots")
   pts.material.size=3*2*1300/h*(FOV/42)*1.0;skyMat.uniforms.uScale.value=PR*Math.max(.8,h/900);bloom.material.size=pts.material.size*3.2;rMat.uniforms.uRes.value.set(renderer.domElement.width,renderer.domElement.height);
-  renderer.setClearColor(0x000000,1);renderer.clear()}
+  smk.width=Math.ceil(w*.5);smk.height=Math.ceil(h*.5);renderer.setClearColor(0x000000,1);renderer.clear()}
 addEventListener('resize',resize);resize();
 function place(h,v,z){const az=Math.abs(z),hw=Math.tan(FOV*Math.PI/360)*aspect*az,f=.45+v*.5,e=(-4+f*(TOP+4))*Math.PI/180;return[(h*2-1)*hw*.88,az*Math.tan(e)]}
 const rz=()=>-(950+R()*750);
@@ -198,12 +229,12 @@ class Shell{
     if(!this.starCount){const d=o.starDensity||1,sc=this.spreadSize/54;this.starCount=Math.max(6,sc*sc*d)}}
   launch(h,v,z=rz()){const p=place(h,v,z);this.launchAt(p[0],p[1],z)}
   launchAt(x,y,z){const y0=-Math.abs(z)*.045,dist=y-y0,col=(this.color&&!Array.isArray(this.color)&&this.color!=='random')?this.color:COLOR.White,ht=this.horsetail,
-      dur=ht?700+dist*.6:900+dist*1.3,c=this.comet=addStar(x,y0,z,col,0,1,0,0,dur);
-    c.path={fx:x,fy:y0,fz:z,tx:x,ty:y,tz:z,lin:ht};c.spin=rnd(.32,.85)*8;if(ht)c.vy=dist/(dur/16.667);
+      dur=ht?700+dist*.6:900+dist*1.3,c=this.comet=addStar(x,y0,z,LC,0,1,0,0,dur);
+    c.path={fx:x,fy:y0,fz:z,tx:x,ty:y,tz:z,lin:ht};c.spin=rnd(.04,.16)*8;if(ht)c.vy=dist/(dur/16.667);
     c.sf=high()?8:32/QL();c.sl=320;c.slv=3;
     if(this.glitter==='willow'||this.fallingLeaves){c.sf=20/QL();c.ss=.5;c.sl=500}
-    if(this.color===INV)c.sk=COLOR.Gold;
-    if(R()>.4&&!ht){c.sc=INV;c.trans=Math.pow(R(),1.5)*700+500}
+    launchFx(x,y0,z);
+    if(R()>.4&&!ht){c.sc=INV;c.trans=Math.pow(R(),1.5)*260+120}
     c.death=cm=>this.burst(cm.x,cm.y,cm.z)}
   burst(x,y,z){
     const speed=this.spreadSize/88*SPEEDK;let onDeath,sf,ss,sl,slv=.25,col;
@@ -227,6 +258,7 @@ class Shell{
     else{const c0=this.color[0],c1=this.color[1];
       if(R()<.5){const n=rdir().slice();sphere(this.starCount,(dx,dy,dz)=>factory(dx,dy,dz,dx*n[0]+dy*n[1]+dz*n[2]>0?c0:c1))}
       else sphere(this.starCount,(dx,dy,dz)=>factory(dx,dy,dz,R()<.5?c0:c1))}
+    if(this.shellSize!==undefined)smokeBurst(x,y,z,this.spreadSize);
     // REAL-LOOK CHANGE: the instant "pop" - a burst of fast white-hot sparks that die within a few frames
     {const nf=low()?18:high()?56:34,fc=(col&&col!==INV)?col:COLOR.Gold;
       for(let i=0;i<nf;i++){rdir();addSpark(x,y,z,R()<.55?COLOR.White:fc,D[0],D[1],D[2],this.spreadSize/20*(.35+R()*.8),220+R()*260)}}
@@ -279,11 +311,11 @@ function update(dt){
   for(let i=stars.length-1;i>=0;i--){const s=stars[i];s.life-=ts;
     if(s.life<=0){stars[i]=stars[stars.length-1];stars.pop();const d=s.death;if(d)d(s);s.death=null;starPool.push(s);continue}
     const burn=Math.sqrt(s.life/s.full),bi=1-burn;s.px=s.x;s.py=s.y;s.pz=s.z;
-    if(s.path){const p=s.path,u=1-s.life/s.full,e=p.lin?u:1-Math.pow(1-u,1.8);s.spinA+=.8*speed;
+    if(s.path){const p=s.path,u=1-s.life/s.full,e=p.lin?u:1-Math.pow(1-u,2.1);s.spinA+=.8*speed;if(frame%8===0)addSmoke(s.x,s.y,s.z,14+R()*10,.3,2500+R()*2000);
       s.x=p.fx+(p.tx-p.fx)*e+Math.sin(s.spinA)*s.spin;s.y=p.fy+(p.ty-p.fy)*e+Math.cos(s.spinA)*s.spin;s.z=p.fz+(p.tz-p.fz)*e}
     else{if(s.sw){const c_=Math.cos(s.sw*speed),n_=Math.sin(s.sw*speed),t_=s.vx*c_-s.vy*n_;s.vy=s.vx*n_+s.vy*c_;s.vx=t_}s.vx+=wS;s.x+=s.vx*speed;s.y+=s.vy*speed;s.z+=s.vz*speed;const dr=s.heavy?sdh:sd;s.vx*=dr;s.vy*=dr;s.vz*=dr;s.vy-=g}
     if(s.hist&&frame%2===0){if(!s.hx)s.hx=new Float32Array(H*3);const j=s.hi*3;s.hx[j]=s.x;s.hx[j+1]=s.y;s.hx[j+2]=s.z;s.hi=(s.hi+1)%H;if(s.hn<H)s.hn++}
-    if(s.sf){s.st-=ts;while(s.st<0){s.st+=s.sf*.75+s.sf*bi*4;rdir();addSpark(s.x,s.y,s.z,s.sk,D[0],D[1],D[2],R()*s.ss*burn,s.sl*.8+R()*s.slv*s.sl)}}
+    if(s.sf){s.st-=ts;while(s.st<0){s.st+=s.sf*.75+s.sf*bi*4;rdir();addSpark(s.x,s.y,s.z,s.path?(R()<.3?COLOR.Orange:R()<.25?COLOR.White:COLOR.Gold):s.sk,D[0],D[1],D[2],R()*s.ss*burn,s.sl*.8+R()*s.slv*s.sl)}}
     if(s.life<s.trans){if(s.sc&&!s.changed){s.changed=true;s.c=s.sc;if(s.sc===INV)s.sf=0}
       if(s.strobe)s.vis=Math.floor(s.life/s.sfq)%3===0}
     const c=s.c;if(c!==INV){cnt++;sr+=c.r;sg+=c.g;sb+=c.b}
@@ -312,7 +344,7 @@ function update(dt){
   ['position','color'].forEach(n=>{const a=pg.attributes[n];a.updateRange.offset=0;a.updateRange.count=np*3;a.needsUpdate=true});
   ['position','tail','color','aux'].forEach(n=>{const a=lg.attributes[n];a.updateRange.offset=0;a.updateRange.count=nq*12;a.needsUpdate=true});
   const sw=Math.sin(frame*.004),kx=innerHeight/900;camera.position.set(sw*16+(R()-.5)*shake*4,Math.sin(frame*.0031)*8+(R()-.5)*shake*4,0);
-  LY[0].style.transform=`translateX(${(-sw*5*kx).toFixed(2)}px)`;LY[1].style.transform=`translateX(${(-sw*7.5*kx).toFixed(2)}px)`;LY[2].style.transform=`translateX(${(-sw*12*kx).toFixed(2)}px)`;shake*=Math.pow(.88,speed);renderer.render(FADE,ortho);renderer.render(scene,camera);
+  LY[0].style.transform=`translateX(${(-sw*5*kx).toFixed(2)}px)`;LY[1].style.transform=`translateX(${(-sw*7.5*kx).toFixed(2)}px)`;LY[2].style.transform=`translateX(${(-sw*12*kx).toFixed(2)}px)`;shake*=Math.pow(.88,speed);drawSmoke(speed);renderer.render(FADE,ortho);renderer.render(scene,camera);
   flashActive.forEach(s=>{scene.remove(s);flashPool.push(s)});flashActive=[]}
 let last=performance.now();
 function loop(now){requestAnimationFrame(loop);const dt=Math.min(now-last,48);last=now;if(running())update(dt)}
