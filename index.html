@@ -1,9 +1,8 @@
-<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Happy Diwali – Fireworks 3D</title>
-<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Yatra+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&amp;family=Yatra+One&amp;family=Great+Vibes&amp;display=swap" rel="stylesheet">
 <style>
 :root{color-scheme:dark;--ui:rgba(255,255,255,.5)}
 *{box-sizing:border-box}
@@ -29,22 +28,26 @@ input[type=checkbox]{width:26px;height:26px;margin:0;opacity:.6}
 #cl{display:block;margin:18px auto 0;font:inherit;color:#fff;background:rgba(255,255,255,.25);border:0;border-radius:2px;padding:6px 18px;text-transform:uppercase;cursor:pointer}
 #cl:hover{background:#09f}
 small{display:block;text-align:center;opacity:.7;margin-top:14px;font-size:.75em}
-#hd{position:fixed;left:0;right:0;top:11%;text-align:center;pointer-events:none;font-family:'Yatra One','Russo One',serif;color:#ffcf6b;text-shadow:0 0 18px rgba(255,150,30,.8),0 0 50px rgba(255,90,0,.5);opacity:0;animation:hd 9s ease-in-out 1.5s forwards}
-#hd b{display:block;font-weight:400;font-size:clamp(28px,6vw,64px);letter-spacing:.08em}#hd i{display:block;font-style:normal;font-size:clamp(14px,2.2vw,24px);margin-top:6px;opacity:.8}
-@keyframes hd{0%{opacity:0;transform:translateY(8px)}18%,70%{opacity:1;transform:none}100%{opacity:0}}
+/* centre greeting */
+#hd{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;opacity:0;animation:hd 11s ease-in-out 1.2s forwards;letter-spacing:0}
+#hd .hi{font-family:'Yatra One','Noto Sans Devanagari',serif;font-size:clamp(26px,5.5vw,64px);letter-spacing:.08em;background:linear-gradient(180deg,#fff3c4,#ffb938 55%,#ff7a18);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 14px rgba(255,140,20,.75))}
+#hd .en{font-family:'Great Vibes','Brush Script MT',cursive;font-size:clamp(64px,17vw,200px);line-height:1.05;margin-top:.05em;background:linear-gradient(180deg,#fffbe8 0%,#ffd86b 50%,#ff9d2e 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(255,150,30,.8)) drop-shadow(0 0 60px rgba(255,80,0,.5))}
+#hd .or{font-size:clamp(14px,2.4vw,26px);color:#ffcf6b;opacity:.85;letter-spacing:.7em;margin-top:.4em;text-shadow:0 0 12px rgba(255,140,20,.8)}
+@keyframes hd{0%{opacity:0;transform:scale(.94);filter:blur(8px)}16%,72%{opacity:1;transform:scale(1);filter:none}100%{opacity:0;transform:scale(1.04);filter:blur(4px)}}
 </style></head>
 <body>
-<canvas id="c"></canvas>
+<canvas id="c" width="345" height="1066"></canvas>
 <div id="sk"></div>
-<svg class="ly" id="l1" viewBox="0 0 200 20" preserveAspectRatio="none"></svg><svg class="ly" id="l2" viewBox="0 0 200 20" preserveAspectRatio="none"></svg>
-<div id="glow"></div>
-<svg class="ly" id="sil" viewBox="0 0 200 10" preserveAspectRatio="none"></svg><div id="hd"><b>शुभ दीपावली</b><i>Happy Diwali</i></div>
-<div id="ctl"><button class="b" id="bp">⏸</button><button class="b" id="bs">🔇</button><button class="b" id="bm">⚙</button></div>
+<svg class="ly" id="l1" viewBox="0 0 200 20" preserveAspectRatio="none" style="transform: translateX(-5.5px);"><defs><linearGradient id="g0" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0e1a36"></stop><stop offset="1" stop-color="#05070f"></stop></linearGradient></defs><path d="M0 20 L0 12.28 L1 12.25 L2 12.22 L3 12.02 L4 12.18 L5 12.04 L6 11.91 L7 11.90 L8 11.91 L9 12.14 L10 11.84 L11 12.20 L12 12.07 L13 12.39 L14 12.43 L15 12.70 L16 12.83 L17 12.81 L18 13.21 L19 13.32 L20 13.34 L21 13.80 L22 13.75 L23 13.97 L24 14.40 L25 14.42 L26 14.55 L27 14.43 L28 14.71 L29 14.68 L30 14.56 L31 14.49 L32 14.41 L33 14.24 L34 14.19 L35 14.05 L36 13.73 L37 13.55 L38 13.49 L39 13.14 L40 13.11 L41 12.94 L42 12.74 L43 12.44 L44 12.22 L45 12.19 L46 12.12 L47 11.98 L48 11.78 L49 12.03 L50 11.85 L51 11.95 L52 12.24 L53 12.27 L54 12.34 L55 12.51 L56 12.79 L57 12.99 L58 13.24 L59 13.70 L60 13.81 L61 14.09 L62 14.33 L63 14.61 L64 14.79 L65 14.69 L66 15.14 L67 15.22 L68 15.35 L69 15.35 L70 15.42 L71 15.36 L72 15.42 L73 15.41 L74 15.41 L75 15.18 L76 15.05 L77 15.31 L78 15.25 L79 15.02 L80 15.06 L81 15.00 L82 15.22 L83 14.95 L84 15.29 L85 15.21 L86 15.34 L87 15.53 L88 15.63 L89 15.89 L90 15.92 L91 16.34 L92 16.51 L93 16.66 L94 17.01 L95 17.38 L96 17.28 L97 17.47 L98 17.73 L99 18.08 L100 18.02 L101 18.12 L102 18.05 L103 18.12 L104 18.17 L105 17.93 L106 17.81 L107 17.76 L108 17.57 L109 17.42 L110 17.11 L111 16.92 L112 16.57 L113 16.27 L114 16.08 L115 15.47 L116 15.22 L117 15.10 L118 14.57 L119 14.26 L120 14.21 L121 13.99 L122 13.71 L123 13.66 L124 13.21 L125 13.34 L126 13.24 L127 12.93 L128 13.19 L129 12.88 L130 13.00 L131 13.20 L132 12.89 L133 12.97 L134 13.22 L135 12.91 L136 12.92 L137 12.96 L138 13.12 L139 12.79 L140 12.76 L141 12.56 L142 12.50 L143 12.48 L144 12.18 L145 12.12 L146 11.69 L147 11.63 L148 11.34 L149 11.00 L150 10.72 L151 10.61 L152 10.40 L153 10.38 L154 10.08 L155 10.02 L156 9.71 L157 9.91 L158 9.76 L159 9.83 L160 9.89 L161 9.73 L162 10.02 L163 10.04 L164 10.28 L165 10.55 L166 10.76 L167 11.04 L168 10.99 L169 11.43 L170 11.61 L171 11.82 L172 11.95 L173 12.38 L174 12.50 L175 12.66 L176 12.65 L177 12.93 L178 12.77 L179 13.00 L180 12.91 L181 12.82 L182 12.66 L183 12.55 L184 12.55 L185 12.42 L186 12.19 L187 11.85 L188 12.00 L189 11.57 L190 11.52 L191 11.16 L192 11.02 L193 11.04 L194 10.86 L195 10.89 L196 10.81 L197 10.74 L198 10.67 L199 10.55 L200 10.61 L200 20 Z" fill="url(#g0)"></path></svg><svg class="ly" id="l2" viewBox="0 0 200 20" preserveAspectRatio="none" style="transform: translateX(-8.25px);"><defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#070b18"></stop><stop offset="1" stop-color="#020309"></stop></linearGradient></defs><path d="M0 20 L0 18.40 L1 18.46 L2 18.29 L3 18.40 L4 18.29 L5 17.88 L6 17.76 L7 17.41 L8 17.04 L9 17.05 L10 16.39 L11 16.40 L12 15.84 L13 15.69 L14 15.32 L15 15.03 L16 14.94 L17 14.93 L18 14.78 L19 14.70 L20 14.45 L21 14.67 L22 14.71 L23 14.69 L24 14.67 L25 14.68 L26 14.87 L27 15.10 L28 15.09 L29 14.85 L30 15.09 L31 14.88 L32 14.91 L33 14.82 L34 14.83 L35 14.55 L36 14.53 L37 14.34 L38 14.21 L39 14.00 L40 13.80 L41 14.02 L42 13.82 L43 13.65 L44 13.73 L45 13.83 L46 14.15 L47 14.11 L48 14.37 L49 14.58 L50 14.77 L51 14.86 L52 14.99 L53 15.22 L54 15.41 L55 15.46 L56 15.44 L57 15.56 L58 15.75 L59 15.71 L60 15.68 L61 15.44 L62 15.38 L63 14.94 L64 14.79 L65 14.69 L66 14.27 L67 14.28 L68 13.86 L69 13.66 L70 13.73 L71 13.52 L72 13.37 L73 13.22 L74 13.11 L75 13.14 L76 13.35 L77 13.57 L78 13.59 L79 13.65 L80 13.77 L81 13.87 L82 13.75 L83 13.98 L84 13.76 L85 13.83 L86 13.99 L87 13.89 L88 13.89 L89 13.67 L90 13.50 L91 13.23 L92 13.28 L93 13.06 L94 13.05 L95 13.00 L96 13.18 L97 13.08 L98 13.10 L99 13.12 L100 13.47 L101 13.39 L102 13.62 L103 14.12 L104 14.33 L105 14.85 L106 15.09 L107 15.42 L108 15.71 L109 16.02 L110 16.19 L111 16.65 L112 16.54 L113 16.96 L114 17.08 L115 17.13 L116 17.00 L117 17.10 L118 17.20 L119 17.14 L120 17.10 L121 16.87 L122 17.00 L123 16.96 L124 16.77 L125 16.97 L126 16.86 L127 16.85 L128 16.97 L129 17.12 L130 17.09 L131 17.17 L132 17.41 L133 17.55 L134 17.55 L135 18.01 L136 17.99 L137 18.12 L138 18.07 L139 18.11 L140 17.94 L141 17.83 L142 17.88 L143 17.66 L144 17.18 L145 17.08 L146 16.98 L147 16.77 L148 16.54 L149 16.37 L150 15.90 L151 15.80 L152 15.61 L153 15.52 L154 15.40 L155 15.44 L156 15.48 L157 15.82 L158 15.79 L159 15.94 L160 16.07 L161 16.25 L162 16.26 L163 16.47 L164 16.69 L165 17.05 L166 16.89 L167 17.25 L168 17.29 L169 17.16 L170 16.96 L171 17.01 L172 16.87 L173 16.81 L174 16.70 L175 16.56 L176 16.67 L177 16.56 L178 16.21 L179 16.33 L180 16.19 L181 16.18 L182 16.22 L183 16.30 L184 16.54 L185 16.58 L186 16.70 L187 16.91 L188 17.11 L189 17.21 L190 17.05 L191 17.26 L192 17.27 L193 17.27 L194 17.18 L195 17.03 L196 16.89 L197 16.61 L198 16.40 L199 16.27 L200 15.81 L200 20 Z" fill="url(#g1)"></path></svg>
+<div id="glow" style="background: linear-gradient(to top, rgba(255, 190, 53, 0.024), rgba(255, 190, 53, 0));"></div>
+<svg class="ly" id="sil" viewBox="0 0 200 10" preserveAspectRatio="none" style="transform: translateX(-13.19px);"><path d="M0 10 L0.0 6.37 L0.8 6.97 L1.6 5.62 L2.4 6.22 L3.2 5.79 L4.0 6.39 L4.8 5.54 L5.6 6.14 L6.4 3.76 L7.2 6.27 L8.0 5.59 L8.8 6.98 L9.6 6.20 L10.4 6.80 L11.2 6.43 L12.0 7.03 L12.8 5.99 L13.6 6.59 L14.4 4.93 L15.2 7.62 L16.0 6.66 L16.8 7.26 L17.6 6.89 L18.4 7.49 L19.2 7.80 L20.0 8.40 L20.8 7.80 L21.6 8.40 L22.4 7.40 L23.2 8.40 L24.0 7.18 L24.8 8.40 L25.6 7.76 L26.4 8.36 L27.2 7.08 L28.0 7.68 L28.8 7.23 L29.6 7.83 L30.4 6.88 L31.2 7.48 L32.0 6.95 L32.8 8.40 L33.6 6.91 L34.4 7.97 L35.2 7.57 L36.0 8.17 L36.8 7.15 L37.6 7.75 L38.4 7.20 L39.2 7.80 L40.0 6.34 L40.8 8.40 L41.6 7.47 L42.4 8.40 L43.2 6.80 L44.0 7.40 L44.8 5.86 L45.6 6.72 L46.4 5.85 L47.2 6.45 L48.0 5.06 L48.8 7.15 L49.6 5.84 L50.4 6.44 L51.2 5.58 L52.0 6.18 L52.8 5.31 L53.6 5.91 L54.4 5.19 L55.2 5.79 L56.0 3.76 L56.8 5.81 L57.6 4.15 L58.4 5.16 L59.2 3.78 L60.0 5.80 L60.8 4.33 L61.6 5.44 L62.4 3.78 L63.2 4.38 L64.0 3.50 L64.8 4.10 L65.6 2.35 L66.4 4.10 L67.2 3.67 L68.0 5.07 L68.8 3.81 L69.6 4.41 L70.4 2.80 L71.2 4.10 L72.0 3.50 L72.8 4.10 L73.6 3.72 L74.4 4.32 L75.2 3.42 L76.0 4.10 L76.8 4.16 L77.6 4.76 L78.4 3.84 L79.2 4.54 L80.0 4.08 L80.8 4.68 L81.6 2.39 L82.4 4.74 L83.2 4.74 L84.0 5.34 L84.8 3.66 L85.6 4.26 L86.4 2.55 L87.2 4.95 L88.0 4.75 L88.8 5.35 L89.6 3.94 L90.4 4.54 L91.2 4.26 L92.0 4.86 L92.8 4.08 L93.6 4.68 L94.4 3.55 L95.2 4.15 L96.0 1.94 L96.8 4.10 L97.6 3.50 L98.4 4.10 L99.2 3.41 L100.0 5.10 L100.8 2.16 L101.6 4.22 L102.4 2.43 L103.2 4.10 L104.0 4.31 L104.8 4.91 L105.6 2.29 L106.4 4.29 L107.2 3.60 L108.0 4.20 L108.8 2.54 L109.6 4.10 L110.4 3.89 L111.2 4.49 L112.0 4.63 L112.8 5.23 L113.6 3.63 L114.4 5.01 L115.2 3.09 L116.0 5.11 L116.8 3.50 L117.6 4.10 L118.4 3.50 L119.2 4.10 L120.0 3.72 L120.8 4.77 L121.6 3.30 L122.4 4.66 L123.2 1.59 L124.0 4.10 L124.8 3.67 L125.6 4.27 L126.4 3.50 L127.2 4.10 L128.0 3.68 L128.8 4.28 L129.6 3.50 L130.4 4.10 L131.2 3.50 L132.0 4.10 L132.8 3.81 L133.6 4.41 L134.4 3.89 L135.2 4.49 L136.0 3.50 L136.8 4.10 L137.6 3.50 L138.4 4.10 L139.2 3.69 L140.0 4.29 L140.8 3.50 L141.6 4.10 L142.4 4.05 L143.2 4.65 L144.0 4.42 L144.8 5.02 L145.6 4.03 L146.4 4.96 L147.2 3.90 L148.0 4.60 L148.8 4.38 L149.6 4.98 L150.4 4.57 L151.2 5.17 L152.0 2.32 L152.8 4.68 L153.6 2.78 L154.4 4.78 L155.2 3.33 L156.0 4.92 L156.8 3.88 L157.6 4.48 L158.4 4.79 L159.2 5.50 L160.0 3.88 L160.8 5.69 L161.6 4.55 L162.4 5.48 L163.2 3.81 L164.0 4.41 L164.8 3.50 L165.6 4.10 L166.4 3.50 L167.2 4.10 L168.0 3.83 L168.8 4.43 L169.6 2.07 L170.4 4.14 L171.2 3.56 L172.0 4.16 L172.8 3.50 L173.6 4.10 L174.4 3.50 L175.2 4.10 L176.0 4.31 L176.8 4.91 L177.6 3.96 L178.4 4.56 L179.2 3.50 L180.0 4.10 L180.8 3.60 L181.6 4.20 L182.4 3.95 L183.2 4.55 L184.0 2.55 L184.8 5.16 L185.6 3.28 L186.4 5.98 L187.2 3.38 L188.0 6.16 L188.8 5.07 L189.6 5.67 L190.4 4.56 L191.2 5.16 L192.0 3.22 L192.8 4.29 L193.6 4.31 L194.4 4.91 L195.2 3.21 L196.0 4.74 L196.8 3.77 L197.6 4.58 L198.4 4.45 L199.2 5.05 L200.0 5.14 L200.8 5.74 L200 10 Z" fill="#000"></path></svg>
+<div id="hd"><div class="hi">शुभ दीपावली</div><div class="en">Happy Diwali</div><div class="or">✦ ❖ ✦</div></div>
+<div id="ctl"><button class="b" id="bp">⏸</button><button class="b" id="bm">⚙</button></div>
 <div id="menu"><div class="in"><h2>Settings</h2>
-<label><span>Shell Type</span><select id="o_shell"></select></label>
-<label><span>Shell Size</span><select id="o_size"></select></label>
-<label><span>Quality</span><select id="o_q"></select></label>
-<label><span>Sky Lighting</span><select id="o_sky"></select></label>
+<label><span>Shell Type</span><select id="o_shell"><option value="Random">Random</option><option value="Crackle">Crackle</option><option value="Crossette">Crossette</option><option value="Crysanthemum">Crysanthemum</option><option value="Falling Leaves">Falling Leaves</option><option value="Floral">Floral</option><option value="Ghost">Ghost</option><option value="Horse Tail">Horse Tail</option><option value="Palm">Palm</option><option value="Ring">Ring</option><option value="Strobe">Strobe</option><option value="Swirl">Swirl</option><option value="Willow">Willow</option></select></label>
+<label><span>Shell Size</span><select id="o_size"><option value="0">3"</option><option value="1">4"</option><option value="2">6"</option><option value="3">8"</option><option value="4">12"</option><option value="5">16"</option></select></label>
+<label><span>Quality</span><select id="o_q"><option value="1">Low</option><option value="2">Normal</option><option value="3">High</option></select></label>
+<label><span>Sky Lighting</span><select id="o_sky"><option value="0">None</option><option value="1">Dim</option><option value="2">Normal</option></select></label>
 <label><span>Auto Fire</span><input type="checkbox" id="o_auto"></label>
 <label><span>Finale Mode</span><input type="checkbox" id="o_fin"></label>
 <label><span>Hide Controls</span><input type="checkbox" id="o_hide"></label>
@@ -54,31 +57,27 @@ small{display:block;text-align:center;opacity:.7;margin-top:14px;font-size:.75em
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 'use strict';
-// Realistic 3D fireworks (three.js).
-//  • white-hot -> colour -> orange ember colour curve on every star
-//  • gradient comet trails + sparks that fade out as they burn
-//  • soft bloom layer, twinkling night sky, tree-line silhouette
-//  • speed-of-sound delay: bang arrives after the flash, farther shells = longer delay
 const R=Math.random,TAU=Math.PI*2,rnd=(a,b)=>a+R()*(b-a),$=id=>document.getElementById(id);
 const IS_MOBILE=innerWidth<=640,HI=(navigator.hardwareConcurrency||0)>=(innerWidth<=1024?4:8);
 const cfg={quality:HI?3:2,shell:'Random',size:IS_MOBILE?2:3,auto:true,finale:false,sky:2,shutter:false,hide:false};
-let paused=false,soundOn=false,menuOpen=false;
+let paused=false,menuOpen=false;
 const QL=()=>+cfg.quality,low=()=>QL()===1,high=()=>QL()===3,running=()=>!paused&&!menuOpen;
+const playSound=()=>{},delayOf=()=>0;
 
 // ---------- colours
-const mk=(r,g,b)=>({r,g,b}),COLOR={Red:mk(255,0,67),Green:mk(20,252,86),Blue:mk(30,127,255),Purple:mk(230,10,255),Gold:mk(255,191,54),Orange:mk(255,105,15),Pink:mk(255,40,140),White:mk(255,255,255)},INV=mk(0,0,0),CODES=Object.values(COLOR);
+const mk=(r,g,b)=>({r,g,b}),COLOR={Red:mk(255,0,67),Green:mk(20,252,86),Blue:mk(30,127,255),Purple:mk(230,10,255),Gold:mk(255,191,54),Orange:mk(255,105,15),Pink:mk(255,40,140),White:mk(255,255,255)},INV=mk(0,0,0);
 const WC=[COLOR.Gold,COLOR.Gold,COLOR.Gold,COLOR.Orange,COLOR.Orange,COLOR.Red,COLOR.Pink,COLOR.Green,COLOR.Blue,COLOR.Purple,COLOR.White],rc0=()=>WC[R()*WC.length|0];let lastColor;
 function randomColor(o={}){let c=rc0();if(o.limitWhite&&c===COLOR.White&&R()<.6)c=rc0();
   if(o.notSame)while(c===lastColor)c=rc0();else if(o.notColor)while(c===o.notColor)c=rc0();lastColor=c;return c}
 const whiteOrGold=()=>R()<.5?COLOR.Gold:COLOR.White,pistilFor=c=>(c===COLOR.White||c===COLOR.Gold)?randomColor({notColor:c}):whiteOrGold();
 
-// ---------- shell types
-const chrys=(s=1)=>{const glitter=R()<.6,single=R()<.72,color=single?randomColor({limitWhite:true}):[randomColor(),randomColor({notSame:true})],
-  pistil=single&&R()<.42,pc=pistil&&pistilFor(color),second=single&&(R()<.2||color===COLOR.White)?pc||randomColor({notColor:color,limitWhite:true}):null,
-  streamers=!pistil&&color!==COLOR.White&&R()<.42;let d=glitter?1.4:1.6;if(low())d*=.8;if(high())d=1.5;
-  return{shellSize:s,spreadSize:300+s*100,starLife:900+s*200,starDensity:d,color,secondColor:second,glitter:glitter?'light':'',glitterColor:whiteOrGold(),pistil,pistilColor:pc,streamers}};
+// ---------- shell types (no heart)
+const chrys=(s=1)=>{const glitter=R()<.65,single=R()<.72,color=single?randomColor({limitWhite:true}):[randomColor(),randomColor({notSame:true})],
+  pistil=single&&R()<.45,pc=pistil&&pistilFor(color),second=single&&(R()<.2||color===COLOR.White)?pc||randomColor({notColor:color,limitWhite:true}):null,
+  streamers=!pistil&&color!==COLOR.White&&R()<.42;let d=glitter?1.9:2.1;if(low())d*=.8;if(high())d=2.2;
+  return{shellSize:s,spreadSize:320+s*105,starLife:1000+s*220,starDensity:d,color,secondColor:second,glitter:glitter?'light':'',glitterColor:whiteOrGold(),pistil,pistilColor:pc,streamers}};
 const ghost=(s=1)=>{const h=chrys(s);h.starLife*=1.5;const gc=randomColor({notColor:COLOR.White});h.streamers=true;h.color=INV;h.secondColor=gc;h.glitter='';return h};
-const strobe=(s=1)=>{const color=randomColor({limitWhite:true});return{shellSize:s,spreadSize:280+s*92,starLife:1100+s*200,starLifeVariation:.4,starDensity:1.1,color,glitter:'light',glitterColor:COLOR.White,strobe:true,strobeColor:R()<.5?COLOR.White:null,pistil:R()<.5,pistilColor:pistilFor(color)}};
+const strobe=(s=1)=>{const color=randomColor({limitWhite:true});return{shellSize:s,spreadSize:280+s*92,starLife:1100+s*200,starLifeVariation:.4,starDensity:1.2,color,glitter:'light',glitterColor:COLOR.White,strobe:true,strobeColor:R()<.5?COLOR.White:null,pistil:R()<.5,pistilColor:pistilFor(color)}};
 const palm=(s=1)=>{const thick=R()<.5;return{shellSize:s,color:randomColor(),spreadSize:250+s*75,starDensity:thick?.15:.4,starLife:1800+s*200,glitter:thick?'thick':'heavy'}};
 const ring=(s=1)=>{const color=randomColor(),pistil=R()<.75;return{shellSize:s,ring:true,color,spreadSize:300+s*100,starLife:900+s*200,starCount:2.2*TAU*(s+1),pistil,pistilColor:pistilFor(color),glitter:!pistil?'light':'',glitterColor:color===COLOR.Gold?COLOR.Gold:COLOR.White,streamers:R()<.3}};
 const crossette=(s=1)=>{const color=randomColor({limitWhite:true});return{shellSize:s,spreadSize:300+s*100,starLife:750+s*160,starLifeVariation:.4,starDensity:.85,color,crossette:true,pistil:R()<.5,pistilColor:pistilFor(color)}};
@@ -87,53 +86,41 @@ const leaves=(s=1)=>({shellSize:s,color:INV,spreadSize:300+s*120,starDensity:.12
 const willow=(s=1)=>({shellSize:s,spreadSize:300+s*100,starDensity:.6,starLife:3000+s*300,glitter:'willow',glitterColor:COLOR.Gold,color:INV});
 const crackle=(s=1)=>{const color=R()<.75?COLOR.Gold:randomColor();return{shellSize:s,spreadSize:380+s*75,starDensity:low()?.65:1,starLife:600+s*100,starLifeVariation:.32,glitter:'light',glitterColor:COLOR.Gold,color,crackle:true,pistil:R()<.65,pistilColor:pistilFor(color)}};
 const horsetail=(s=1)=>{const color=randomColor();return{shellSize:s,horsetail:true,color,spreadSize:250+s*38,starDensity:.9,starLife:2500+s*300,glitter:'medium',glitterColor:R()<.5?whiteOrGold():color,strobe:color===COLOR.White}};
-// swirl: every star keeps curving the same way, so the burst unwinds as a spiral / pinwheel
 const swirl=(s=1)=>{const color=randomColor({limitWhite:true});return{shellSize:s,spreadSize:300+s*100,starLife:1500+s*200,starDensity:.9,color,secondColor:R()<.5?randomColor({notColor:color,limitWhite:true}):null,glitter:'light',glitterColor:whiteOrGold(),swirl:(R()<.5?1:-1)*(.05+R()*.025),pistil:R()<.5,pistilColor:pistilFor(color)}};
-// heart: stars fly out along a heart curve facing the viewer
-const heart=(s=1)=>({shellSize:s,heart:true,color:R()<.6?COLOR.Red:COLOR.Pink,spreadSize:260+s*70,starLife:1300+s*150,starCount:90+s*20,glitter:'light',glitterColor:COLOR.White});
 const randomShellName=()=>R()<.5?'Crysanthemum':shellNames[(R()*(shellNames.length-1)+1)|0];
-const shellTypes={'Random':s=>shellTypes[randomShellName()](s),'Crackle':crackle,'Crossette':crossette,'Crysanthemum':chrys,'Falling Leaves':leaves,'Floral':floral,'Ghost':ghost,'Horse Tail':horsetail,'Palm':palm,'Ring':ring,'Strobe':strobe,'Swirl':swirl,'Heart':heart,'Willow':willow};
+const shellTypes={'Random':s=>shellTypes[randomShellName()](s),'Crackle':crackle,'Crossette':crossette,'Crysanthemum':chrys,'Falling Leaves':leaves,'Floral':floral,'Ghost':ghost,'Horse Tail':horsetail,'Palm':palm,'Ring':ring,'Strobe':strobe,'Swirl':swirl,'Willow':willow};
 const shellNames=Object.keys(shellTypes),shellFromConfig=s=>shellTypes[cfg.shell](s),shellSize=()=>+cfg.size;
 const fastBlack=['Falling Leaves','Floral','Willow'];
-function randomFastShell(){const rnd_=cfg.shell==='Random';let n=rnd_?randomShellName():cfg.shell;if(rnd_)while(fastBlack.includes(n))n=randomShellName();return shellTypes[n]}
-
-// ---------- audio (synthesised). dl0 = extra delay in seconds (speed of sound)
-let AC,MG,NB,lastSmall=0;
-function aInit(){try{AC=new(window.AudioContext||window.webkitAudioContext)();MG=AC.createGain();MG.gain.value=.6;MG.connect(AC.destination);
-  const len=AC.sampleRate*2.5,ib=AC.createBuffer(2,len,AC.sampleRate);for(let c=0;c<2;c++){const d=ib.getChannelData(c);for(let i=0;i<len;i++)d[i]=(R()*2-1)*Math.pow(1-i/len,3)}
-  const cn=AC.createConvolver(),w=AC.createGain();cn.buffer=ib;w.gain.value=.4;MG.connect(cn);cn.connect(w);w.connect(AC.destination);
-  NB=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate);const d=NB.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=R()*2-1}catch(e){AC=null}}
-function nz(type,f0,f1,dur,vol,dl=0,q=1){if(!AC)return;const t=AC.currentTime+dl,s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();
-  s.buffer=NB;f.type=type;f.Q.value=q;f.frequency.setValueAtTime(f0,t);f.frequency.exponentialRampToValueAtTime(f1,t+dur);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(f);f.connect(g);g.connect(MG);s.start(t,R()*.3);s.stop(t+dur)}
-function tone(f0,f1,dur,vol,dl=0){if(!AC)return;const t=AC.currentTime+dl,o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+dur);
-  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(MG);o.start(t);o.stop(t+dur+.05)}
-function playSound(type,sc=1,dl0=0){if(!AC||!soundOn||!running())return;sc=Math.min(1,Math.max(0,sc));
-  if(type==='lift'){tone(120,40,.25,.3);nz('bandpass',500,2400,1.3,.12,.05,2)}
-  else if(type==='burst'){const d=.2+R()*.15+dl0;nz('lowpass',700,50,2,.9*sc,d);tone(95,28,.6,.7*sc,d);nz('highpass',1500,1501,.12,.25*sc,d)}
-  else if(type==='burstSmall'){const n=Date.now();if(n-lastSmall<20)return;lastSmall=n;nz('lowpass',1500,200,.25,.18,.15+dl0)}
-  else{const n=type==='crackle'?16:6;for(let i=0;i<n;i++)nz('highpass',4000,4001,.04,type==='crackle'?.18:.25,.15+dl0+R()*1.2)}}
-const delayOf=z=>Math.abs(z)/1800;
+function randomFastShell(){const r_=cfg.shell==='Random';let n=r_?randomShellName():cfg.shell;if(r_)while(fastBlack.includes(n))n=randomShellName();return shellTypes[n]}
 
 // ---------- three.js scene
 const cvs=$('c'),renderer=new THREE.WebGLRenderer({canvas:cvs,antialias:false,preserveDrawingBuffer:true});
 renderer.autoClear=false;renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(42,1,10,6000),FADE=new THREE.Scene(),ortho=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
-const fadeMat=new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.175,depthTest:false,depthWrite:false});
+const fadeMat=new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.17,depthTest:false,depthWrite:false});
 FADE.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),fadeMat));
 const glow=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d'),g=x.createRadialGradient(32,32,0,32,32,32);
   g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.3,'rgba(255,255,255,.5)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,64,64);return new THREE.CanvasTexture(c)})();
 const flashTex=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),g=x.createRadialGradient(64,64,0,64,64,64);
   g.addColorStop(.024,'rgba(255,255,255,1)');g.addColorStop(.125,'rgba(255,160,20,.2)');g.addColorStop(.32,'rgba(255,140,20,.11)');g.addColorStop(1,'rgba(255,120,20,0)');x.fillStyle=g;x.fillRect(0,0,128,128);return new THREE.CanvasTexture(c)})();
-// night-sky starfield (far away, dim, twinkles)
-// stars live on a big dome around the camera (depth 2200-5200 -> parallax) and the whole dome keeps turning round a celestial pole,
-// so every star moves in a slow circle, always in the same direction. Plus a faint Milky Way band.
+
+// glowing, twinkling WebGL starfield on a slowly rotating dome + faint Milky Way
 const SN=15000,SP=new Float32Array(SN*3),SC=new Float32Array(SN*3),POLE=new THREE.Vector3(.15,.6,-.78).normalize();let skyA=0;
 for(let i=0;i<SN;i++){let dx,dy,dz,rad,b;
   if(i<12000){dy=2*R()-1;const a=R()*TAU,r=Math.sqrt(1-dy*dy);dx=r*Math.cos(a);dz=r*Math.sin(a);rad=2200+R()*3000;b=.06+Math.pow(R(),4)*.4}
   else{const ph=R()*TAU,lat=(R()+R()+R()-1.5)*.16,bx=Math.cos(ph)*Math.cos(lat),by=Math.sin(lat),bz=Math.sin(ph)*Math.cos(lat),tl=.9;dx=bx;dy=by*Math.cos(tl)-bz*Math.sin(tl);dz=by*Math.sin(tl)+bz*Math.cos(tl);rad=4800;b=.03+R()*.11*Math.exp(-Math.abs(lat)/.08)}
   const t=R();SP[i*3]=dx*rad;SP[i*3+1]=dy*rad;SP[i*3+2]=dz*rad;SC[i*3]=b*(.8+.2*t);SC[i*3+1]=b*.9;SC[i*3+2]=b*(1-.2*t)}
 const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.BufferAttribute(SP,3));sg.setAttribute('color',new THREE.BufferAttribute(SC,3));
-const skyStars=new THREE.Points(sg,new THREE.PointsMaterial({size:6,sizeAttenuation:true,vertexColors:true,transparent:true,opacity:.8,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending}));
+const SZ=new Float32Array(SN),TW=new Float32Array(SN*2);
+for(let i=0;i<SN;i++){const b=SC[i*3+1]/.9;SZ[i]=i<12000?1.4+Math.min(.5,b)*9+(R()<.03?2.5:0):1.5;TW[i*2]=R()*TAU;TW[i*2+1]=.6+R()*2.2}
+sg.setAttribute('size',new THREE.BufferAttribute(SZ,1));sg.setAttribute('tw',new THREE.BufferAttribute(TW,2));
+const skyMat=new THREE.ShaderMaterial({uniforms:{uTime:{value:0},uScale:{value:1}},transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,
+vertexShader:`attribute float size;attribute vec2 tw;attribute vec3 color;uniform float uTime,uScale;varying vec3 vC;
+void main(){float t=.6+.4*sin(uTime*tw.y+tw.x)*sin(uTime*tw.y*.37+tw.x*1.7);vC=color*(.55+t)*2.2;
+gl_PointSize=size*uScale*(.8+.35*t);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+fragmentShader:`varying vec3 vC;void main(){float d=length(gl_PointCoord-.5)*2.;if(d>1.)discard;float core=exp(-d*d*28.),halo=pow(1.-d,3.)*.45;gl_FragColor=vec4(vC*(core*1.2+halo),1.);}`});
+const skyStars=new THREE.Points(sg,skyMat);
+
 const CAPS=7000,CAPK=14000;
 const PP=new Float32Array(CAPS*3),PC=new Float32Array(CAPS*3);
 const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(PP,3).setUsage(THREE.DynamicDrawUsage));pg.setAttribute('color',new THREE.BufferAttribute(PC,3).setUsage(THREE.DynamicDrawUsage));
@@ -144,7 +131,6 @@ const lg=new THREE.BufferGeometry();
 lg.setIndex(new THREE.BufferAttribute(QI,1));
 let nq=0;
 function quad(x,y,z,tx,ty,tz,r,g,b,w,r2,g2,b2){if(nq>=CAPQ)return;const o=nq*12,e=r2!==undefined;for(let k=0;k<4;k++){const j=o+k*3,u=e&&k>1;QH[j]=x;QH[j+1]=y;QH[j+2]=z;QT[j]=tx;QT[j+1]=ty;QT[j+2]=tz;QC[j]=u?r2:r;QC[j+1]=u?g2:g;QC[j+2]=u?b2:b;QA[j+2]=w}nq++}
-// polyline trail through the star's recent positions; colour fades head->tail with no taper seams (negative width = no taper)
 function ribbon(s,r,g,b){const S=Math.min(s.hn,H-1),Q=6;let px=s.x,py=s.y,pz=s.z;
   for(let q=0;q<Q;q++){const i=((s.hi-Math.round((q+1)*S/Q)+H*2)%H)*3,x=s.hx[i],y=s.hx[i+1],z=s.hx[i+2],k0=Math.pow(1-q/Q,1.4),k1=Math.pow(1-(q+1)/Q,1.4);
     quad(px,py,pz,x,y,z,r*k0,g*k0,b*k0,-1.2*PR,r*k1,g*k1,b*k1);px=x;py=y;pz=z}}
@@ -156,39 +142,35 @@ vec2 n=vec2(-dir.y,dir.x),p=sa+dir*L*aux.y+n*aux.x*abs(aux.z)*mix(1.,.2,aux.y*st
 vC=color;vA=vec3(aux.xy,aux.z<0.?1.:0.);gl_Position=vec4(p/(uRes*.5),0.,1.);}`,
   fragmentShader:`varying vec3 vC;varying vec3 vA;void main(){float t=1.-vA.y;gl_FragColor=vec4(vC*1.8,mix(t*t,1.,vA.z)*(1.-vA.x*vA.x));}`});
 const pmat=o=>new THREE.PointsMaterial({map:glow,size:10,vertexColors:true,transparent:true,opacity:o,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending});
-const pts=new THREE.Points(pg,pmat(1)),bloom=new THREE.Points(pg,pmat(.08)); // bloom = same particles, huge + faint
+const pts=new THREE.Points(pg,pmat(1)),bloom=new THREE.Points(pg,pmat(.14));
 const lines=new THREE.Mesh(lg,rMat);
 [skyStars,bloom,pts,lines].forEach(o=>{o.frustumCulled=false;scene.add(o)});
 const flashPool=[];let flashActive=[],glowB=0;
 const lights=[];let shake=0;
 function burstFlash(x,y,z,r,c){if(c!==undefined&&lights.length<24){c=Array.isArray(c)?c[0]:(c&&c!=='random'&&c!==INV?c:COLOR.Gold);lights.push({x,y,z,r:r*5,cr:c.r/255,cg:c.g/255,cb:c.b/255,i:Math.min(.8,r/70),life:3500,full:3500});if(r>60)shake=Math.min(1,shake+r/260)}
   const s=flashPool.pop()||new THREE.Sprite(new THREE.SpriteMaterial({map:flashTex,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending}));
-  s.position.set(x,y,z);const fr_=Math.min(r*1.3,150);s.scale.set(fr_,fr_,1);s.material.opacity=.7;scene.add(s);flashActive.push(s);glowB=Math.min(.4,glowB+r/2600)}
-
+  s.position.set(x,y,z);const fr_=Math.min(r*1.9,240);s.scale.set(fr_,fr_,1);s.material.opacity=.9;scene.add(s);flashActive.push(s);glowB=Math.min(.4,glowB+r/2600)}
 
 let aspect=1,FOV=42,TOP=38;
 function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);aspect=w/h;FOV=aspect<.8?62:42;camera.fov=FOV;camera.aspect=aspect;
   const pitch=FOV/2-4;camera.rotation.set(pitch*Math.PI/180,0,0);TOP=pitch+FOV/2;camera.updateProjectionMatrix();
-  pts.material.size=3*2*1300/h*(FOV/42)*1.35;skyStars.material.size=1.7*7000/h;bloom.material.size=pts.material.size*4;rMat.uniforms.uRes.value.set(renderer.domElement.width,renderer.domElement.height);
+  pts.material.size=3*2*1300/h*(FOV/42)*1.6;skyMat.uniforms.uScale.value=PR*Math.max(.8,h/900);bloom.material.size=pts.material.size*4;rMat.uniforms.uRes.value.set(renderer.domElement.width,renderer.domElement.height);
   renderer.setClearColor(0x000000,1);renderer.clear()}
 addEventListener('resize',resize);resize();
-// where a (screen-fraction h, height v) launch lands in 3D at depth z
 function place(h,v,z){const az=Math.abs(z),hw=Math.tan(FOV*Math.PI/360)*aspect*az,f=.45+v*.5,e=(-4+f*(TOP+4))*Math.PI/180;return[(h*2-1)*hw*.88,az*Math.tan(e)]}
 const rz=()=>-(950+R()*750);
 
-
-// tree-line silhouette
+// tree-line + mountain ridges
 (()=>{let d='M0 10',h=4;for(let i=0;i<=200;i+=1.6){h+=(R()-.5)*2.2;h=Math.max(2.2,Math.min(6.5,h));const spike=R()<.35?R()*2.2:0;d+=` L${i.toFixed(1)} ${(10-h-spike).toFixed(2)} L${(i+.8).toFixed(1)} ${(10-h+.6).toFixed(2)}`}
   $('sil').innerHTML=`<path d="${d} L200 10 Z" fill="#000"/>`})();
 const LY=[$('l1'),$('l2'),$('sil')];
-// layered mountain ridges: far ones are bluer/hazier and sway less than near ones -> parallax depth; burst light tints them via #glow
 [['l1','#0e1a36','#05070f',7,5.5],['l2','#070b18','#020309',4.5,3.6]].forEach(([id,c1,c2,base,amp],n)=>{
   const p=[R()*6,R()*6,R()*6],f=n?1.35:1;let d='M0 20';
   for(let i=0;i<=200;i+=1){const h=base+amp*(Math.sin(i*.028*f+p[0])*.5+Math.sin(i*.071*f+p[1])*.3+Math.sin(i*.17*f+p[2])*.2)+(R()-.5)*.35;d+=` L${i} ${(20-h).toFixed(2)}`}
   $(id).innerHTML=`<defs><linearGradient id="g${n}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><path d="${d} L200 20 Z" fill="url(#g${n})"/>`});
 
 // ---------- particles
-const H=20,TL=10,GRAV=.9,stars=[],sparks=[],starPool=[],sparkPool=[],D=[0,0,0];
+const H=20,TL=14,GRAV=.9,stars=[],sparks=[],starPool=[],sparkPool=[],D=[0,0,0];
 let wind=0,windT=R()*100;
 function rdir(){const z=2*R()-1,a=R()*TAU,r=Math.sqrt(1-z*z);D[0]=r*Math.cos(a);D[1]=z;D[2]=r*Math.sin(a);return D}
 function addStar(x,y,z,c,dx,dy,dz,sp,life,ox=0,oy=0,oz=0){const s=starPool.pop()||{};s.x=s.px=x;s.y=s.py=y;s.z=s.pz=z;s.vx=dx*sp+ox;s.vy=dy*sp+oy;s.vz=dz*sp+oz;s.life=s.full=life;s.c=c;s.sk=c;
@@ -196,15 +178,13 @@ function addStar(x,y,z,c,dx,dy,dz,sp,life,ox=0,oy=0,oz=0){const s=starPool.pop()
   if(stars.length<CAPS)stars.push(s);return s}
 function addSpark(x,y,z,c,dx,dy,dz,sp,life){if(sparks.length>=CAPK)return;const s=sparkPool.pop()||{};s.x=s.px=x;s.y=s.py=y;s.z=s.pz=z;s.vx=dx*sp;s.vy=dy*sp;s.vz=dz*sp;s.life=s.full=life;s.c=c;sparks.push(s)}
 const _q=new THREE.Quaternion(),_v=new THREE.Vector3(),_a=new THREE.Vector3();
-// evenly spread n directions over a randomly rotated sphere
 function sphere(n,cb){n=Math.max(1,Math.round(n));_a.set(R()-.5,R()-.5,R()-.5).normalize();_q.setFromAxisAngle(_a,R()*TAU);const off=R()*TAU;
   for(let i=0;i<n;i++){const y=1-2*(i+.5)/n,r=Math.sqrt(1-y*y),t=i*2.39996323+off;_v.set(Math.cos(t)*r,y,Math.sin(t)*r).applyQuaternion(_q);
     _v.x+=(R()-.5)*.24;_v.y+=(R()-.5)*.24;_v.z+=(R()-.5)*.24;_v.normalize();cb(_v.x,_v.y,_v.z)}}
 
-// star death effects
 function crossetteFx(s){sphere(4,(dx,dy,dz)=>addStar(s.x,s.y,s.z,s.c,dx,dy,dz,R()*.6+.75,600))}
-function floralFx(s){sphere(12+6*QL(),(dx,dy,dz)=>addStar(s.x,s.y,s.z,s.c,dx,dy,dz,2.4,1000+R()*300,s.vx,s.vy,s.vz));burstFlash(s.x,s.y,s.z,46);playSound('burstSmall',1,delayOf(s.z))}
-function leavesFx(s){sphere(7,(dx,dy,dz)=>{const n=addStar(s.x,s.y,s.z,INV,dx,dy,dz,2.4,2400+R()*600,s.vx,s.vy,s.vz);n.sk=COLOR.Gold;n.sf=144/QL();n.ss=.28;n.sl=750;n.slv=3.2});burstFlash(s.x,s.y,s.z,46);playSound('burstSmall',1,delayOf(s.z))}
+function floralFx(s){sphere(12+6*QL(),(dx,dy,dz)=>addStar(s.x,s.y,s.z,s.c,dx,dy,dz,2.4,1000+R()*300,s.vx,s.vy,s.vz));burstFlash(s.x,s.y,s.z,46)}
+function leavesFx(s){sphere(7,(dx,dy,dz)=>{const n=addStar(s.x,s.y,s.z,INV,dx,dy,dz,2.4,2400+R()*600,s.vx,s.vy,s.vz);n.sk=COLOR.Gold;n.sf=144/QL();n.ss=.28;n.sl=750;n.slv=3.2});burstFlash(s.x,s.y,s.z,46)}
 function crackleFx(s){const n=high()?32:16;for(let i=0;i<n;i++){rdir();addSpark(s.x,s.y,s.z,COLOR.Gold,D[0],D[1],D[2],Math.pow(R(),.45)*2.4,300+R()*200)}}
 const GL={light:[400,.3,300,2],medium:[200,.44,700,2],heavy:[80,.8,1400,2],thick:[16,1.5,1400,3],streamer:[32,1.05,620,2],willow:[120,.34,1400,3.8]};
 
@@ -219,11 +199,11 @@ class Shell{
     if(this.glitter==='willow'||this.fallingLeaves){c.sf=20/QL();c.ss=.5;c.sl=500}
     if(this.color===INV)c.sk=COLOR.Gold;
     if(R()>.4&&!ht){c.sc=INV;c.trans=Math.pow(R(),1.5)*700+500}
-    c.death=cm=>this.burst(cm.x,cm.y,cm.z);playSound('lift')}
+    c.death=cm=>this.burst(cm.x,cm.y,cm.z)}
   burst(x,y,z){
     const speed=this.spreadSize/88;let onDeath,sf,ss,sl,slv=.25,played=false,col;
-    if(this.crossette)onDeath=s=>{if(!played){playSound('crackleSmall',1,delayOf(s.z));played=true}crossetteFx(s)};
-    if(this.crackle)onDeath=s=>{if(!played){playSound('crackle',1,delayOf(s.z));played=true}crackleFx(s)};
+    if(this.crossette)onDeath=s=>{crossetteFx(s)};
+    if(this.crackle)onDeath=s=>{crackleFx(s)};
     if(this.floral)onDeath=floralFx;if(this.fallingLeaves)onDeath=leavesFx;
     if(this.glitter){const g=GL[this.glitter];sf=g[0]/QL();ss=g[1];sl=g[2];slv=g[3];if(this.glitter==='thick'&&high())ss=1.65}
     const std=this.spreadSize/1800,cm=this.comet,ox=this.horsetail&&cm?cm.vx:0,oy=this.horsetail&&cm?cm.vy:std,oz=this.horsetail&&cm?cm.vz:0;
@@ -234,7 +214,7 @@ class Shell{
     const factory=(dx,dy,dz,c)=>apply(addStar(x,y,z,c||randomColor(),dx,dy,dz,speed*(.78+R()*.22),life(),ox,oy,oz));
     if(!Array.isArray(this.color)){
       col=this.color==='random'?null:this.color;
-      if(this.heart){const cnt=this.starCount;for(let i=0;i<cnt;i++){const t=i/cnt*TAU,hx=16*Math.pow(Math.sin(t),3)/17,hy=(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))/17+.08;apply(addStar(x,y,z,col,hx,hy,0,speed*.95,life()))}}else if(this.ring){const n=rdir().slice(),a0=[n[2],0,-n[0]],l=Math.hypot(a0[0],a0[2])||1,a=[a0[0]/l,0,a0[2]/l],b=[0,0,0];
+      if(this.ring){const n=rdir().slice(),a0=[n[2],0,-n[0]],l=Math.hypot(a0[0],a0[2])||1,a=[a0[0]/l,0,a0[2]/l],b=[0,0,0];
         b[0]=n[1]*a[2]-n[2]*a[1];b[1]=n[2]*a[0]-n[0]*a[2];b[2]=n[0]*a[1]-n[1]*a[0];const cnt=this.starCount;
         for(let i=0;i<cnt;i++){const t=i/cnt*TAU,cs=Math.cos(t),sn=Math.sin(t);apply(addStar(x,y,z,col,a[0]*cs+b[0]*sn,a[1]*cs+b[1]*sn,a[2]*cs+b[2]*sn,speed,life()))}}
       else sphere(this.starCount,(dx,dy,dz)=>factory(dx,dy,dz,col))}
@@ -243,12 +223,10 @@ class Shell{
       else sphere(this.starCount,(dx,dy,dz)=>factory(dx,dy,dz,R()<.5?c0:c1))}
     if(this.pistil)new Shell({spreadSize:this.spreadSize*.5,starLife:this.starLife*.6,starLifeVariation:this.starLifeVariation,starDensity:1.4,color:this.pistilColor,glitter:'light',glitterColor:this.pistilColor===COLOR.Gold?COLOR.Gold:COLOR.White}).burst(x,y,z);
     if(this.streamers)new Shell({spreadSize:this.spreadSize*.9,starLife:this.starLife*.8,starLifeVariation:this.starLifeVariation,starCount:Math.floor(Math.max(6,this.spreadSize/45)),color:COLOR.White,glitter:'streamer'}).burst(x,y,z);
-    burstFlash(x,y,z,this.spreadSize/4,this.comet?this.color:undefined);
-    
-    if(this.comet){const md=2,df=Math.min(md,shellSize()-this.shellSize);playSound('burst',(1-df/md)*.3+.7,delayOf(z))}}
+    burstFlash(x,y,z,this.spreadSize/4,this.comet?this.color:undefined)}
 }
 
-// ---------- sequences (ported)
+// ---------- sequences
 function getRandomShellSize(){const base=shellSize(),mv=Math.min(2.5,base),v=R()*mv,size=base-v,height=mv===0?R():1-v/mv,co=R()*(1-height*.65)*.5,x=R()<.5?.5-co:.5+co;
   return{size,x:(1-.36)*x+.18,height:height*.75}}
 function seqRandomShell(){const s=getRandomShellSize(),sh=new Shell(shellFromConfig(s.size));sh.launch(s.x,s.height);return 900+R()*600+(sh.fallingLeaves?4600:sh.starLife)}
@@ -284,24 +262,23 @@ function startSequence(){
 const sky={r:0,g:0,b:0},glowEl=$('glow');let autoT=0,frame=0;
 function update(dt){
   const speed=dt/16.6667,ts=dt,sd=1-.02*speed,sdh=1-.008*speed,spd=1-.1*speed,g=ts/1000*GRAV;frame++;
-  windT+=ts/5000;wind=Math.sin(windT)*.6+Math.sin(windT*2.3+1)*.25;       // slowly shifting breeze
+  windT+=ts/5000;wind=Math.sin(windT)*.6+Math.sin(windT*2.3+1)*.25;
   const wS=wind*.0035*speed,wK=wind*.02*speed;
-  skyStars.material.opacity=.65+.2*Math.sin(frame*.03)+.15*Math.sin(frame*.071);skyA+=.00018*speed;skyStars.quaternion.setFromAxisAngle(POLE,skyA); // gentle twinkle
+  skyMat.uniforms.uTime.value=performance.now()/1000;skyA+=.00018*speed;skyStars.quaternion.setFromAxisAngle(POLE,skyA);
   if(cfg.auto){autoT-=ts;if(autoT<=0)autoT=startSequence()*.85}
   nq=0;let np=0,cnt=0,sr=0,sg=0,sb=0;
   for(let i=stars.length-1;i>=0;i--){const s=stars[i];s.life-=ts;
     if(s.life<=0){stars[i]=stars[stars.length-1];stars.pop();const d=s.death;if(d)d(s);s.death=null;starPool.push(s);continue}
     const burn=Math.sqrt(s.life/s.full),bi=1-burn;s.px=s.x;s.py=s.y;s.pz=s.z;
     if(s.path){const p=s.path,u=1-s.life/s.full,e=p.lin?u:1-Math.pow(1-u,1.8);s.spinA+=.8*speed;
-      s.x=p.fx+(p.tx-p.fx)*e+Math.sin(s.spinA)*s.spin;s.y=p.fy+(p.ty-p.fy)*e+Math.cos(s.spinA)*s.spin;s.z=p.fz+(p.tz-p.fz)*e;
-      }
+      s.x=p.fx+(p.tx-p.fx)*e+Math.sin(s.spinA)*s.spin;s.y=p.fy+(p.ty-p.fy)*e+Math.cos(s.spinA)*s.spin;s.z=p.fz+(p.tz-p.fz)*e}
     else{if(s.sw){const c_=Math.cos(s.sw*speed),n_=Math.sin(s.sw*speed),t_=s.vx*c_-s.vy*n_;s.vy=s.vx*n_+s.vy*c_;s.vx=t_}s.vx+=wS;s.x+=s.vx*speed;s.y+=s.vy*speed;s.z+=s.vz*speed;const dr=s.heavy?sdh:sd;s.vx*=dr;s.vy*=dr;s.vz*=dr;s.vy-=g}
-    if(s.hist&&frame%2===0){if(!s.hx)s.hx=new Float32Array(H*3);const j=s.hi*3;s.hx[j]=s.x;s.hx[j+1]=s.y;s.hx[j+2]=s.z;s.hi=(s.hi+1)%H;if(s.hn<H)s.hn++}if(s.sf){s.st-=ts;while(s.st<0){s.st+=s.sf*.75+s.sf*bi*4;rdir();addSpark(s.x,s.y,s.z,s.sk,D[0],D[1],D[2],R()*s.ss*burn,s.sl*.8+R()*s.slv*s.sl)}}
+    if(s.hist&&frame%2===0){if(!s.hx)s.hx=new Float32Array(H*3);const j=s.hi*3;s.hx[j]=s.x;s.hx[j+1]=s.y;s.hx[j+2]=s.z;s.hi=(s.hi+1)%H;if(s.hn<H)s.hn++}
+    if(s.sf){s.st-=ts;while(s.st<0){s.st+=s.sf*.75+s.sf*bi*4;rdir();addSpark(s.x,s.y,s.z,s.sk,D[0],D[1],D[2],R()*s.ss*burn,s.sl*.8+R()*s.slv*s.sl)}}
     if(s.life<s.trans){if(s.sc&&!s.changed){s.changed=true;s.c=s.sc;if(s.sc===INV)s.sf=0}
       if(s.strobe)s.vis=Math.floor(s.life/s.sfq)%3===0}
     const c=s.c;if(c!==INV){cnt++;sr+=c.r;sg+=c.g;sb+=c.b}
     if(s.vis&&c!==INV){let r=c.r/255,gg=c.g/255,b=c.b/255;
-      // realistic burn: white-hot ignition -> true colour -> dim orange ember
       const w=Math.max(0,1-bi*3.5)*.5,em=s.path?0:Math.max(0,(bi-.55)/.45),br=(1-em*.55)*(.8+R()*.2);
       r+=(1-r)*w;gg+=(1-gg)*w;b+=(1-b)*w;r+=(1-r)*em*.4;gg+=(.4-gg)*em*.5;b+=(.1-b)*em*.6;r*=br;gg*=br;b*=br;
       PP[np*3]=s.x;PP[np*3+1]=s.y;PP[np*3+2]=s.z;PC[np*3]=r;PC[np*3+1]=gg;PC[np*3+2]=b;np++;
@@ -314,14 +291,12 @@ function update(dt){
     s.px=s.x;s.py=s.y;s.pz=s.z;s.vx+=wK;s.x+=s.vx*speed;s.y+=s.vy*speed;s.z+=s.vz*speed;s.vx*=spd;s.vy*=spd;s.vz*=spd;s.vy-=g;
     const c=s.c,k=1*Math.min(1,s.life/s.full*2.2),tl=2.6;quad(s.x,s.y,s.z,s.x-(s.x-s.px)*tl,s.y-(s.y-s.py)*tl,s.z-(s.z-s.pz)*tl,c.r/255*k,c.g/255*k,c.b/255*k,.75*PR)}
   for(let i=lights.length-1;i>=0;i--){const L=lights[i];L.life-=ts;if(L.life<=0){lights[i]=lights[lights.length-1];lights.pop()}}
-  // sky lighting: tint the background by the combined colour of all stars
   if(cfg.sky){const maxSat=cfg.sky*8,inten=Math.pow(Math.min(1,cnt/500),.3),mx=Math.max(1,sr,sg,sb);
     sky.r+=(sr/mx*maxSat*inten-sky.r)/10*speed;sky.g+=(sg/mx*maxSat*inten-sky.g)/10*speed;sky.b+=(sb/mx*maxSat*inten-sky.b)/10*speed}
   else sky.r=sky.g=sky.b=0;
-  // ground glow: horizon lights up with the burst colours + flashes
   {const m=Math.max(1,sky.r,sky.g,sky.b),cr=sky.r/m*255|0,cg=sky.g/m*255|0,cb=sky.b/m*255|0,a=Math.min(.14,m/(Math.max(1,cfg.sky)*15)*.25+glowB*.08);glowB*=Math.pow(.95,speed);
     glowEl.style.background=`linear-gradient(to top,rgba(${cr},${cg},${cb},${a.toFixed(3)}),rgba(${cr},${cg},${cb},0))`}
-  fadeMat.color.setRGB(sky.r/255,sky.g/255,sky.b/255);fadeMat.opacity=cfg.shutter?.0025:Math.min(1,.2*speed);
+  fadeMat.color.setRGB(sky.r/255,sky.g/255,sky.b/255);fadeMat.opacity=cfg.shutter?.0025:Math.min(1,.17*speed);
   pg.setDrawRange(0,np);lg.setDrawRange(0,nq*6);
   pg.attributes.position.needsUpdate=pg.attributes.color.needsUpdate=true;['position','tail','color','aux'].forEach(n=>lg.attributes[n].needsUpdate=true);
   const sw=Math.sin(frame*.004),kx=innerHeight/900;camera.position.set(sw*16+(R()-.5)*shake*4,Math.sin(frame*.0031)*8+(R()-.5)*shake*4,0);
@@ -335,14 +310,14 @@ requestAnimationFrame(loop);
 const fill=(id,a)=>$(id).innerHTML=a.map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
 fill('o_shell',shellNames.map(n=>[n,n]));fill('o_size',['3"','4"','6"','8"','12"','16"'].map((l,i)=>[i,l]));fill('o_q',[[1,'Low'],[2,'Normal'],[3,'High']]);fill('o_sky',[[0,'None'],[1,'Dim'],[2,'Normal']]);
 function sync(){$('o_shell').value=cfg.shell;$('o_size').value=cfg.size;$('o_q').value=cfg.quality;$('o_sky').value=cfg.sky;$('o_auto').checked=cfg.auto;$('o_fin').checked=cfg.finale;$('o_hide').checked=cfg.hide;$('o_shut').checked=cfg.shutter;
-  $('bp').textContent=paused?'▶':'⏸';$('bs').textContent=soundOn?'🔊':'🔇';$('menu').classList.toggle('on',menuOpen);$('ctl').classList.toggle('off',cfg.hide||menuOpen)}
+  $('bp').textContent=paused?'▶':'⏸';$('menu').classList.toggle('on',menuOpen);$('ctl').classList.toggle('off',cfg.hide||menuOpen)}
 const bind=(id,k,fn=v=>v,ev='input')=>$(id).addEventListener(ev,e=>{cfg[k]=fn(e.target.type==='checkbox'?e.target.checked:e.target.value);sync()});
 bind('o_shell','shell');bind('o_size','size',Number);bind('o_q','quality',Number);bind('o_sky','sky',Number);bind('o_auto','auto',v=>v,'change');bind('o_fin','finale',v=>v,'change');bind('o_hide','hide',v=>v,'change');bind('o_shut','shutter',v=>v,'change');
 $('bp').onclick=()=>{paused=!paused;sync()};$('bm').onclick=()=>{menuOpen=true;sync()};$('cl').onclick=()=>{menuOpen=false;sync()};
-$('bs').onclick=()=>{soundOn=!soundOn;if(soundOn){if(!AC)aInit();if(AC&&AC.state==='suspended')AC.resume()}sync()};
 addEventListener('keydown',e=>{if(e.keyCode===80){paused=!paused}else if(e.keyCode===79){menuOpen=!menuOpen}else if(e.keyCode===27){menuOpen=false}sync()});
-let pd0=false;cvs.addEventListener('pointerdown',e=>{if(!pd0){pd0=true;soundOn=true;if(!AC)aInit();if(AC&&AC.state==='suspended')AC.resume();sync()}if(!running())return;const z=-(1000+R()*400),d=new THREE.Vector3(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1,.5).unproject(camera).sub(camera.position).normalize(),t=Math.abs(z)/Math.max(.2,-d.z);
+cvs.addEventListener('pointerdown',e=>{if(!running())return;const z=-(1000+R()*400),d=new THREE.Vector3(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1,.5).unproject(camera).sub(camera.position).normalize(),t=Math.abs(z)/Math.max(.2,-d.z);
   new Shell(shellFromConfig(shellSize())).launchAt(d.x*t,Math.max(250,d.y*t),d.z*t)});
 sync();
 </script>
+
 </body></html>
