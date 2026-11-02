@@ -3,38 +3,35 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Happy Diwali – Fireworks 3D</title>
-<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Yatra+One&family=Great+Vibes&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Tiro+Devanagari+Hindi&family=Russo+One&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:dark;--ui:rgba(255,255,255,.5)}
+:root{color-scheme:dark}
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;background:#000;overflow:hidden;color:var(--ui);font-family:'Russo One',Arial,sans-serif;letter-spacing:.06em}
+html,body{height:100%;margin:0;background:#000;overflow:hidden;font-family:'Russo One',Arial,sans-serif}
 canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
 #glow{position:fixed;left:0;right:0;bottom:0;height:40%;pointer-events:none;mix-blend-mode:screen}
 .ly{position:fixed;left:-4%;bottom:0;width:108%;pointer-events:none;display:block;will-change:transform}
 #l1{height:15%}#l2{height:10%}#sil{height:6%}
 #smk{pointer-events:none;mix-blend-mode:screen}
 #sk{position:fixed;inset:0;pointer-events:none;mix-blend-mode:screen;background:linear-gradient(to top,rgba(26,38,78,.55) 0%,rgba(12,18,42,.35) 22%,rgba(5,8,20,.2) 55%,rgba(0,0,0,0) 100%)}
-#ctl{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;display:flex;justify-content:space-between;transition:opacity .3s}
-#ctl.off{opacity:0;pointer-events:none}
-.b{width:50px;height:50px;border:0;background:none;color:#fff;font-size:22px;opacity:.2;cursor:pointer;transition:opacity .3s}
-.b:hover{opacity:.5}
-#menu{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center}
-#menu.on{display:flex}
-.in{width:100%;max-width:400px;padding:16px;max-height:100%;overflow:auto}
-h2{margin:0 0 14px;text-align:center;text-transform:uppercase;font-weight:400;font-size:2em}
-label{display:flex;align-items:center;margin:14px 0;text-transform:uppercase}
-label>span{width:50%;padding-right:12px;text-align:right}
-select{width:50%;height:30px;font:inherit;color:var(--ui);background:transparent;border:1px solid var(--ui)}
-select option{background:#000}
-input[type=checkbox]{width:26px;height:26px;margin:0;opacity:.6}
-#cl{display:block;margin:18px auto 0;font:inherit;color:#fff;background:rgba(255,255,255,.25);border:0;border-radius:2px;padding:6px 18px;text-transform:uppercase;cursor:pointer}
-#cl:hover{background:#09f}
-small{display:block;text-align:center;opacity:.7;margin-top:14px;font-size:.75em}
-#hd{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;opacity:0;animation:hd 11s ease-in-out 1.2s forwards;letter-spacing:0}
-#hd .hi{font-family:'Yatra One','Noto Sans Devanagari',serif;font-size:clamp(26px,5.5vw,64px);letter-spacing:.08em;background:linear-gradient(180deg,#fff3c4,#ffb938 55%,#ff7a18);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 14px rgba(255,140,20,.75))}
-#hd .en{font-family:'Great Vibes','Brush Script MT',cursive;font-size:clamp(64px,17vw,200px);line-height:1.05;margin-top:.05em;background:linear-gradient(180deg,#fffbe8 0%,#ffd86b 50%,#ff9d2e 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(255,150,30,.8)) drop-shadow(0 0 60px rgba(255,80,0,.5))}
-#hd .or{font-size:clamp(14px,2.4vw,26px);color:#ffcf6b;opacity:.85;letter-spacing:.7em;margin-top:.4em;text-shadow:0 0 12px rgba(255,140,20,.8)}
-@keyframes hd{0%{opacity:0;transform:scale(.94);filter:blur(8px)}16%,72%{opacity:1;transform:scale(1);filter:none}100%{opacity:0;transform:scale(1.04);filter:blur(4px)}}
+
+/* permanent centered greeting */
+#hd{position:fixed;inset:0;padding:0 4%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;letter-spacing:0;opacity:0;animation:hdin 2.5s ease-out .6s forwards}
+#hd .hi{font-family:'Tiro Devanagari Hindi','Noto Serif Devanagari',serif;font-size:clamp(22px,4.2vw,52px);color:#ffe2a0;text-shadow:0 0 12px rgba(255,150,30,.9),0 0 36px rgba(255,100,0,.5)}
+#hd .en{font-family:'Cinzel Decorative','Cinzel',serif;font-weight:700;font-size:clamp(34px,8.5vw,112px);line-height:1.15;margin-top:.1em;padding-left:.14em;text-transform:none;
+  background:linear-gradient(180deg,#fffbe8 0%,#ffd86b 45%,#e8891a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 16px rgba(255,150,30,.75)) drop-shadow(0 0 50px rgba(255,80,0,.4));
+  animation:trk 3.2s ease-out forwards,pulse 4.5s ease-in-out 3.2s infinite}
+#hd .or{display:flex;align-items:center;gap:14px;margin-top:.7em;color:#ffcf6b;font-size:clamp(12px,1.8vw,20px);text-shadow:0 0 10px rgba(255,140,20,.8)}
+#hd .or::before,#hd .or::after{content:"";width:clamp(40px,10vw,120px);height:1px;background:linear-gradient(90deg,transparent,#ffcf6b,transparent)}
+@keyframes hdin{from{opacity:0;transform:scale(.96);filter:blur(8px)}to{opacity:1;transform:none;filter:none}}
+@keyframes trk{from{letter-spacing:.45em}to{letter-spacing:.14em}}
+@keyframes pulse{0%,100%{filter:drop-shadow(0 0 14px rgba(255,150,30,.65)) drop-shadow(0 0 44px rgba(255,80,0,.35))}50%{filter:drop-shadow(0 0 24px rgba(255,170,40,.95)) drop-shadow(0 0 70px rgba(255,90,0,.6))}}
+
+/* small "tap for sound" hint (hidden automatically once sound is running) */
+#snd{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 9%);text-align:center;pointer-events:none;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:#ffe2a0;text-shadow:0 0 10px rgba(255,150,30,.8);opacity:0;animation:snd 2.6s ease-in-out 2s infinite}
+#snd.off{display:none}
+@keyframes snd{0%,100%{opacity:.3}50%{opacity:.95}}
 </style></head>
 <body>
 <canvas id="c"></canvas>
@@ -44,18 +41,8 @@ small{display:block;text-align:center;opacity:.7;margin-top:14px;font-size:.75em
 <svg class="ly" id="l2" viewBox="0 0 200 20" preserveAspectRatio="none"></svg>
 <div id="glow"></div>
 <svg class="ly" id="sil" viewBox="0 0 200 10" preserveAspectRatio="none"></svg>
-<div id="hd"><div class="hi">शुभ दीपावली</div><div class="en">Happy Diwali</div><div class="or">✦ ❖ ✦</div></div>
-<div id="ctl"><button class="b" id="bp">⏸</button><button class="b" id="bm">⚙</button></div>
-<div id="menu"><div class="in"><h2>Settings</h2>
-<label><span>Shell Type</span><select id="o_shell"></select></label>
-<label><span>Shell Size</span><select id="o_size"></select></label>
-<label><span>Quality</span><select id="o_q"></select></label>
-<label><span>Sky Lighting</span><select id="o_sky"></select></label>
-<label><span>Auto Fire</span><input type="checkbox" id="o_auto"></label>
-<label><span>Finale Mode</span><input type="checkbox" id="o_fin"></label>
-<label><span>Hide Controls</span><input type="checkbox" id="o_hide"></label>
-<label><span>Open Shutter</span><input type="checkbox" id="o_shut"></label>
-<button id="cl">Close</button><small>Click / tap anywhere to fire a shell · P pause · O menu</small></div></div>
+<div id="hd"><div class="hi">शुभ दीपावली</div><div class="en">Happy Diwali</div><div class="or">🪔</div></div>
+<div id="snd">🔊 Tap anywhere for sound</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -65,6 +52,87 @@ const IS_MOBILE=innerWidth<=640,HI=(navigator.hardwareConcurrency||0)>=(innerWid
 const cfg={quality:HI?3:2,shell:'Random',size:IS_MOBILE?2:3,auto:true,finale:false,sky:2,shutter:false,hide:false};
 let paused=false,menuOpen=false;
 const QL=()=>+cfg.quality,low=()=>QL()===1,high=()=>QL()===3,running=()=>!paused&&!menuOpen;
+
+// ---------- SOUND (all synthesized with Web Audio, no files needed)
+let AC=null,dry=null,noiseB=null,whiteB=null,crackB=null,voices=0;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function initAudio(){
+  if(AC)return;const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+  try{AC=new C()}catch(e){AC=null;return}
+  const sr=AC.sampleRate,comp=AC.createDynamicsCompressor();
+  comp.threshold.value=-12;comp.knee.value=24;comp.ratio.value=5;comp.attack.value=.002;comp.release.value=.3;
+  const master=AC.createGain();master.gain.value=.9;
+  dry=AC.createGain();
+  // open-air reverb: dark long tail + discrete echoes bouncing off distant hills
+  const verb=AC.createConvolver(),vg=AC.createGain(),len=Math.floor(sr*3.4),ir=AC.createBuffer(2,len,sr);vg.gain.value=.55;
+  for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);let lp=0;
+    for(let i=0;i<len;i++){const u=i/len,a=.5*Math.pow(1-u,1.5)+.03;lp+=((R()*2-1)-lp)*a;d[i]=lp*Math.pow(1-u,2.2)*2.2}
+    const el=Math.floor(sr*.03);
+    [.19,.33,.52,.74].forEach((tp,n)=>{const at=Math.floor((tp+ch*.021)*sr),amp=.8/(n+1.4);for(let j=0;j<el&&at+j<len;j++)d[at+j]+=(R()*2-1)*amp*Math.pow(1-j/el,2)})}
+  verb.buffer=ir;
+  dry.connect(master);dry.connect(verb);verb.connect(vg);vg.connect(master);master.connect(comp);comp.connect(AC.destination);
+  // pink noise (far more natural than white)
+  noiseB=AC.createBuffer(1,sr*3,sr);
+  {const d=noiseB.getChannelData(0);let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+    for(let i=0;i<d.length;i++){const w=R()*2-1;b0=.99886*b0+w*.0555179;b1=.99332*b1+w*.0750759;b2=.969*b2+w*.153852;b3=.8665*b3+w*.3104856;b4=.55*b4+w*.5329522;b5=-.7616*b5-w*.016898;d[i]=(b0+b1+b2+b3+b4+b5+b6+w*.5362)*.11;b6=w*.115926}}
+  whiteB=AC.createBuffer(1,sr*2,sr);{const d=whiteB.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=R()*2-1}
+  // crackle: many separate pops of random size and length, denser at the start
+  crackB=AC.createBuffer(1,Math.floor(sr*2),sr);
+  {const d=crackB.getChannelData(0);
+    for(let k=0;k<130;k++){const cl=Math.floor(sr*(.0007+R()*.005)),at=Math.floor(Math.pow(R(),1.7)*(d.length-cl-1)),amp=.12+Math.pow(R(),2.2)*.88;
+      for(let i=0;i<cl;i++)d[at+i]+=(R()*2-1)*amp*Math.pow(1-i/cl,3)}}
+}
+const sndOk=()=>AC&&AC.state==='running'&&dry;
+function outNode(pan){if(AC.createStereoPanner){const p=AC.createStereoPanner();p.pan.value=pan;p.connect(dry);return p}return dry}
+function panOf(x,z){return clamp(x/(Math.tan(FOV*Math.PI/360)*aspect*Math.abs(z)),-1,1)*.8}
+function noiseSrc(t,dur,off,white){const s=AC.createBufferSource();s.buffer=white?whiteB:noiseB;s.loop=true;s.start(t,off===undefined?R()*2:off);s.stop(t+dur);return s}
+function env(g,t,peak,att,dec){g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(peak,t+att);g.gain.exponentialRampToValueAtTime(.0001,t+att+dec)}
+// filtered noise burst: filter sweeps f0 -> f1 over fT seconds, volume envelope att/dec
+function getSat(dest){const w=AC.createWaveShaper(),n=1024,c=new Float32Array(n),og=AC.createGain();for(let i=0;i<n;i++){const x=i/(n-1)*2-1;c[i]=Math.tanh(x*4)/Math.tanh(4)}
+  w.curve=c;og.gain.value=.55;w.connect(og);og.connect(dest);return w}
+function nz(t,type,f0,f1,fT,peak,att,dec,dest,Q,white,sat){const s=noiseSrc(t,att+dec+.05,undefined,white),f=AC.createBiquadFilter(),g=AC.createGain();
+  f.type=type;f.Q.value=Q||.7;f.frequency.setValueAtTime(f0,t);if(f1!==f0&&fT>0)f.frequency.exponentialRampToValueAtTime(f1,t+fT);
+  env(g,t,peak,att,dec);s.connect(f);f.connect(g);g.connect(sat?getSat(dest):dest);return s}
+function sine(f0,f1,t,dur,peak,att,dest){const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+dur);
+  env(g,t,peak,att,dur);o.connect(g);g.connect(dest);o.start(t);o.stop(t+att+dur+.05)}
+function airBus(x,z){const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=clamp(9500-Math.abs(z)*3.2,3200,7500);lp.connect(outNode(panOf(x,z)));return lp}
+
+// mortar launch: a dull noisy "fup" (no pitched tone) + faint sputtering hiss of the rising shell
+function sndLaunch(x,z,durMs){if(!sndOk())return;
+  const d=Math.abs(z),t=AC.currentTime,gd=clamp(1300/d,.6,1.1),bus=airBus(x,z);
+  nz(t,'lowpass',700*(.9+R()*.2),180,.18,.5*gd,.003,.2,bus,.3);
+  nz(t,'highpass',1500,1500,0,.14*gd,.001,.04,bus,.5,true);
+  if(voices<26){voices++;
+    const len=clamp(durMs/1000,.6,1.9)*.92,s=noiseSrc(t+.05,len+.1),hp=AC.createBiquadFilter(),lp=AC.createBiquadFilter(),g=AC.createGain(),N=Math.max(24,Math.floor(len*40)),c=new Float32Array(N);
+    hp.type='highpass';hp.frequency.value=1400;lp.type='lowpass';lp.frequency.value=5500;
+    for(let i=0;i<N;i++)c[i]=Math.pow(Math.sin(Math.PI*i/(N-1)),.6)*(.3+.7*R())*.06*gd;
+    g.gain.setValueCurveAtTime(c,t+.05,len);s.connect(hp);hp.connect(lp);lp.connect(g);g.connect(bus);s.onended=()=>{voices--}}}
+
+// shell burst: pure broadband noise "BANG" (no tonal thump, that is what made it sound like a drum),
+// then a rolling chain of echoes: ba-ba-ba-boom across the valley
+function sndBurst(x,z,spread,crackle){if(!sndOk()||voices>36)return;
+  const d=Math.abs(z),k=clamp(spread/650,.45,1.35),gd=clamp(1300/d,.65,1.15),t=AC.currentTime+.07+d/1700*.18+R()*.03,r=.85+R()*.3,bus=airBus(x,z);
+  nz(t,'highpass',500,500,0,.5*k*gd,.0005,.11,bus,.5,true,true);            // hard saturated crack
+  nz(t,'bandpass',3200,3200,0,.28*k*gd,.0004,.03,bus,.4,true);              // snap
+  voices++;{const s=nz(t,'lowpass',5200*r,380,.22,.85*k*gd,.001,.28+.22*k,bus,.3,false,true);s.onended=()=>{voices--}}  // body
+  nz(t,'lowpass',170,70,.3,.45*k*gd,.002,.3,bus,.3);                        // short low thud (noise, not a tone)
+  const n=3+Math.floor(R()*3);let et=t+.12;
+  for(let i=0;i<n;i++){et+=.1+R()*.2;const cut=2600/(i*.6+1);nz(et,'lowpass',cut,cut*.3,.3,.5*k*gd/(i+1.7),.004,.25+.1*i,bus,.3)}  // rolling echoes
+  nz(t+.1,'lowpass',260*r,110,1.2,.28*k*gd,.12,.9+.8*k,bus,.3);             // far-off rumble
+  if(crackle&&voices<26){voices++;
+    const s=AC.createBufferSource(),bp=AC.createBiquadFilter(),g=AC.createGain(),dd=1.2+R()*.6,st=t+.2;
+    s.buffer=crackB;s.playbackRate.value=.8+R()*.5;bp.type='bandpass';bp.frequency.value=2800+R()*1500;bp.Q.value=.5;
+    env(g,st,.4*k*gd,.12,dd);s.connect(bp);bp.connect(g);g.connect(bus);s.start(st,R()*.3);s.stop(st+dd+.3);s.onended=()=>{voices--}}}
+// extra mid-air popping for "crackle" shells
+function sndCrackle(x,z){if(!sndOk()||voices>30)return;voices++;
+  const t=AC.currentTime+.05,s=AC.createBufferSource(),bp=AC.createBiquadFilter(),g=AC.createGain();
+  s.buffer=crackB;s.playbackRate.value=1+R()*.3;bp.type='bandpass';bp.frequency.value=3000+R()*1200;bp.Q.value=.5;
+  env(g,t,.5,.01,.9);s.connect(bp);bp.connect(g);g.connect(airBus(x,z));s.start(t,R()*.3);s.stop(t+1.1);s.onended=()=>{voices--}}
+// browsers block audio until the first tap/click/key, so we unlock on the first one
+function sndReady(){$('snd').classList.add('off');['pointerdown','touchend','click','keydown'].forEach(e=>removeEventListener(e,unlock,true))}
+function unlock(){initAudio();if(!AC)return;if(AC.state==='running'){sndReady();return}AC.resume().then(()=>{if(AC.state==='running')sndReady()}).catch(()=>{})}
+initAudio();if(AC){AC.onstatechange=()=>{if(AC.state==='running')sndReady()};if(AC.state==='running')sndReady()}
+['pointerdown','touchend','click','keydown'].forEach(e=>addEventListener(e,unlock,true));
 
 // ---------- colours
 const mk=(r,g,b)=>({r,g,b}),COLOR={Red:mk(255,0,67),Green:mk(20,252,86),Blue:mk(30,127,255),Purple:mk(230,10,255),Gold:mk(255,191,54),Orange:mk(255,105,15),Pink:mk(255,40,140),White:mk(255,255,255)},INV=mk(0,0,0);
@@ -123,7 +191,6 @@ gl_PointSize=size*uScale*(.8+.35*t);gl_Position=projectionMatrix*modelViewMatrix
 fragmentShader:`varying vec3 vC;void main(){float d=length(gl_PointCoord-.5)*2.;if(d>1.)discard;float core=exp(-d*d*28.),halo=pow(1.-d,3.)*.45;gl_FragColor=vec4(vC*(core*1.2+halo),1.);}`});
 const skyStars=new THREE.Points(sg,skyMat);
 
-// REAL-LOOK CHANGE: bigger quad budget (every star gets a ribbon trail now)
 const CAPS=7000,CAPK=14000;
 const PP=new Float32Array(CAPS*3),PC=new Float32Array(CAPS*3);
 const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(PP,3).setUsage(THREE.DynamicDrawUsage));pg.setAttribute('color',new THREE.BufferAttribute(PC,3).setUsage(THREE.DynamicDrawUsage));
@@ -186,7 +253,6 @@ function drawSmoke(speed){const w=smk.width,h=smk.height;if(!w)return;camera.upd
 let aspect=1,FOV=42,TOP=38;
 function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);aspect=w/h;FOV=aspect<.8?62:42;camera.fov=FOV;camera.aspect=aspect;
   const pitch=FOV/2-4;camera.rotation.set(pitch*Math.PI/180,0,0);TOP=pitch+FOV/2;camera.updateProjectionMatrix();
-  // REAL-LOOK CHANGE: smaller, crisper star heads (no more big soft "dots")
   pts.material.size=3*2*1300/h*(FOV/42)*1.0;skyMat.uniforms.uScale.value=PR*Math.max(.8,h/900);bloom.material.size=pts.material.size*3.2;rMat.uniforms.uRes.value.set(renderer.domElement.width,renderer.domElement.height);
   smk.width=Math.ceil(w*.5);smk.height=Math.ceil(h*.5);renderer.setClearColor(0x000000,1);renderer.clear()}
 addEventListener('resize',resize);resize();
@@ -204,7 +270,6 @@ const LY=[$('l1'),$('l2'),$('sil')];
 
 // ---------- particles
 const H=20,TL=14,GRAV=.9,stars=[],sparks=[],starPool=[],sparkPool=[],D=[0,0,0];
-// REAL-LOOK CHANGE: strong air drag -> shell snaps outward fast, then slows and hangs, then gravity takes over
 const DRAG=.05,SPEEDK=2.3;
 let wind=0,windT=R()*100;
 function rdir(){const z=2*R()-1,a=R()*TAU,r=Math.sqrt(1-z*z);D[0]=r*Math.cos(a);D[1]=z;D[2]=r*Math.sin(a);return D}
@@ -213,7 +278,6 @@ function addStar(x,y,z,c,dx,dy,dz,sp,life,ox=0,oy=0,oz=0){const s=starPool.pop()
   if(stars.length<CAPS)stars.push(s);return s}
 function addSpark(x,y,z,c,dx,dy,dz,sp,life){if(sparks.length>=CAPK)return;const s=sparkPool.pop()||{};s.x=s.px=x;s.y=s.py=y;s.z=s.pz=z;s.vx=dx*sp;s.vy=dy*sp;s.vz=dz*sp;s.life=s.full=life;s.c=c;sparks.push(s)}
 const _q=new THREE.Quaternion(),_v=new THREE.Vector3(),_a=new THREE.Vector3();
-// REAL-LOOK CHANGE: more random jitter so stars don't form a visibly perfect dotted sphere
 function sphere(n,cb){n=Math.max(1,Math.round(n));_a.set(R()-.5,R()-.5,R()-.5).normalize();_q.setFromAxisAngle(_a,R()*TAU);const off=R()*TAU;
   for(let i=0;i<n;i++){const y=1-2*(i+.5)/n,r=Math.sqrt(1-y*y),t=i*2.39996323+off;_v.set(Math.cos(t)*r,y,Math.sin(t)*r).applyQuaternion(_q);
     _v.x+=(R()-.5)*.5;_v.y+=(R()-.5)*.5;_v.z+=(R()-.5)*.5;_v.normalize();cb(_v.x,_v.y,_v.z)}}
@@ -221,7 +285,7 @@ function sphere(n,cb){n=Math.max(1,Math.round(n));_a.set(R()-.5,R()-.5,R()-.5).n
 function crossetteFx(s){sphere(4,(dx,dy,dz)=>addStar(s.x,s.y,s.z,s.c,dx,dy,dz,(R()*.6+.75)*SPEEDK,600))}
 function floralFx(s){sphere(12+6*QL(),(dx,dy,dz)=>addStar(s.x,s.y,s.z,s.c,dx,dy,dz,2.4*SPEEDK,1000+R()*300,s.vx,s.vy,s.vz));burstFlash(s.x,s.y,s.z,46)}
 function leavesFx(s){sphere(7,(dx,dy,dz)=>{const n=addStar(s.x,s.y,s.z,INV,dx,dy,dz,2.4*SPEEDK,2400+R()*600,s.vx,s.vy,s.vz);n.sk=COLOR.Gold;n.sf=144/QL();n.ss=.28;n.sl=750;n.slv=3.2});burstFlash(s.x,s.y,s.z,46)}
-function crackleFx(s){const n=high()?32:16;for(let i=0;i<n;i++){rdir();addSpark(s.x,s.y,s.z,COLOR.Gold,D[0],D[1],D[2],Math.pow(R(),.45)*2.4,300+R()*200)}}
+function crackleFx(s){sndCrackle(s.x,s.z);const n=high()?32:16;for(let i=0;i<n;i++){rdir();addSpark(s.x,s.y,s.z,COLOR.Gold,D[0],D[1],D[2],Math.pow(R(),.45)*2.4,300+R()*200)}}
 const GL={light:[400,.3,300,2],medium:[200,.44,700,2],heavy:[80,.8,1400,2],thick:[16,1.5,1400,3],streamer:[32,1.05,620,2],willow:[120,.34,1400,3.8]};
 
 class Shell{
@@ -233,17 +297,17 @@ class Shell{
     c.path={fx:x,fy:y0,fz:z,tx:x,ty:y,tz:z,lin:ht};c.spin=rnd(.04,.16)*8;if(ht)c.vy=dist/(dur/16.667);
     c.sf=high()?8:32/QL();c.sl=320;c.slv=3;
     if(this.glitter==='willow'||this.fallingLeaves){c.sf=20/QL();c.ss=.5;c.sl=500}
-    launchFx(x,y0,z);
+    launchFx(x,y0,z);sndLaunch(x,z,dur);
     if(R()>.4&&!ht){c.sc=INV;c.trans=Math.pow(R(),1.5)*260+120}
     c.death=cm=>this.burst(cm.x,cm.y,cm.z)}
   burst(x,y,z){
     const speed=this.spreadSize/88*SPEEDK;let onDeath,sf,ss,sl,slv=.25,col;
+    if(this.shellSize!==undefined)sndBurst(x,z,this.spreadSize,!!(this.glitter&&this.glitter!=='streamer')||!!this.crackle);
     if(this.crossette)onDeath=s=>{crossetteFx(s)};
     if(this.crackle)onDeath=s=>{crackleFx(s)};
     if(this.floral)onDeath=floralFx;if(this.fallingLeaves)onDeath=leavesFx;
     if(this.glitter){const g=GL[this.glitter];sf=g[0]/QL();ss=g[1];sl=g[2];slv=g[3];if(this.glitter==='thick'&&high())ss=1.65}
     const std=this.spreadSize/1800,cm=this.comet,ox=this.horsetail&&cm?cm.vx:0,oy=this.horsetail&&cm?cm.vy:std,oz=this.horsetail&&cm?cm.vz:0;
-    // REAL-LOOK CHANGE: every long-lived star keeps a smooth ribbon trail
     const apply=s=>{if(this.starLife>=600)s.hist=true;if(this.secondColor){s.trans=this.starLife*(R()*.05+.32);s.sc=this.secondColor}
       if(this.strobe){s.trans=this.starLife*(R()*.08+.46);s.strobe=true;s.sfq=R()*20+40;if(this.strobeColor)s.sc=this.strobeColor}
       if(this.swirl)s.sw=this.swirl;s.death=onDeath;if(this.glitter){s.sf=sf;s.ss=ss;s.sl=sl;s.slv=slv;s.sk=this.glitterColor;s.st=R()*sf}};
@@ -259,7 +323,6 @@ class Shell{
       if(R()<.5){const n=rdir().slice();sphere(this.starCount,(dx,dy,dz)=>factory(dx,dy,dz,dx*n[0]+dy*n[1]+dz*n[2]>0?c0:c1))}
       else sphere(this.starCount,(dx,dy,dz)=>factory(dx,dy,dz,R()<.5?c0:c1))}
     if(this.shellSize!==undefined)smokeBurst(x,y,z,this.spreadSize);
-    // REAL-LOOK CHANGE: the instant "pop" - a burst of fast white-hot sparks that die within a few frames
     {const nf=low()?18:high()?56:34,fc=(col&&col!==INV)?col:COLOR.Gold;
       for(let i=0;i<nf;i++){rdir();addSpark(x,y,z,R()<.55?COLOR.White:fc,D[0],D[1],D[2],this.spreadSize/20*(.35+R()*.8),220+R()*260)}}
     if(this.pistil)new Shell({spreadSize:this.spreadSize*.5,starLife:this.starLife*.6,starLifeVariation:this.starLifeVariation,starDensity:1.4,color:this.pistilColor,glitter:'light',glitterColor:this.pistilColor===COLOR.Gold?COLOR.Gold:COLOR.White}).burst(x,y,z);
@@ -320,7 +383,6 @@ function update(dt){
       if(s.strobe)s.vis=Math.floor(s.life/s.sfq)%3===0}
     const c=s.c;if(c!==INV){cnt++;sr+=c.r;sg+=c.g;sb+=c.b}
     if(s.vis&&c!==INV){let r=c.r/255,gg=c.g/255,b=c.b/255;
-      // white-hot at ignition -> true colour -> ember orange/red, with slight flicker
       const w=Math.max(0,1-bi*3.5)*.55,em=s.path?0:Math.max(0,(bi-.55)/.45),br=(1-em*.6)*(.68+R()*.32);
       r+=(1-r)*w;gg+=(1-gg)*w;b+=(1-b)*w;r+=(1-r)*em*.4;gg+=(.4-gg)*em*.5;b+=(.1-b)*em*.6;r*=br;gg*=br;b*=br;
       PP[np*3]=s.x;PP[np*3+1]=s.y;PP[np*3+2]=s.z;PC[np*3]=r;PC[np*3+1]=gg;PC[np*3+2]=b;np++;
@@ -340,7 +402,6 @@ function update(dt){
     glowEl.style.background=`linear-gradient(to top,rgba(${cr},${cg},${cb},${a.toFixed(3)}),rgba(${cr},${cg},${cb},0))`}
   fadeMat.color.setRGB(sky.r/255,sky.g/255,sky.b/255);fadeMat.opacity=cfg.shutter?.0025:Math.min(1,.17*speed);
   pg.setDrawRange(0,np);lg.setDrawRange(0,nq*6);
-  // upload only the used part of each buffer (keeps it fast with the bigger quad budget)
   ['position','color'].forEach(n=>{const a=pg.attributes[n];a.updateRange.offset=0;a.updateRange.count=np*3;a.needsUpdate=true});
   ['position','tail','color','aux'].forEach(n=>{const a=lg.attributes[n];a.updateRange.offset=0;a.updateRange.count=nq*12;a.needsUpdate=true});
   const sw=Math.sin(frame*.004),kx=innerHeight/900;camera.position.set(sw*16+(R()-.5)*shake*4,Math.sin(frame*.0031)*8+(R()-.5)*shake*4,0);
@@ -350,17 +411,8 @@ let last=performance.now();
 function loop(now){requestAnimationFrame(loop);const dt=Math.min(now-last,48);last=now;if(running())update(dt)}
 requestAnimationFrame(loop);
 
-// ---------- UI
-const fill=(id,a)=>$(id).innerHTML=a.map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
-fill('o_shell',shellNames.map(n=>[n,n]));fill('o_size',['3"','4"','6"','8"','12"','16"'].map((l,i)=>[i,l]));fill('o_q',[[1,'Low'],[2,'Normal'],[3,'High']]);fill('o_sky',[[0,'None'],[1,'Dim'],[2,'Normal']]);
-function sync(){$('o_shell').value=cfg.shell;$('o_size').value=cfg.size;$('o_q').value=cfg.quality;$('o_sky').value=cfg.sky;$('o_auto').checked=cfg.auto;$('o_fin').checked=cfg.finale;$('o_hide').checked=cfg.hide;$('o_shut').checked=cfg.shutter;
-  $('bp').textContent=paused?'▶':'⏸';$('menu').classList.toggle('on',menuOpen);$('ctl').classList.toggle('off',cfg.hide||menuOpen)}
-const bind=(id,k,fn=v=>v,ev='input')=>$(id).addEventListener(ev,e=>{cfg[k]=fn(e.target.type==='checkbox'?e.target.checked:e.target.value);sync()});
-bind('o_shell','shell');bind('o_size','size',Number);bind('o_q','quality',Number);bind('o_sky','sky',Number);bind('o_auto','auto',v=>v,'change');bind('o_fin','finale',v=>v,'change');bind('o_hide','hide',v=>v,'change');bind('o_shut','shutter',v=>v,'change');
-$('bp').onclick=()=>{paused=!paused;sync()};$('bm').onclick=()=>{menuOpen=true;sync()};$('cl').onclick=()=>{menuOpen=false;sync()};
-addEventListener('keydown',e=>{if(e.keyCode===80){paused=!paused}else if(e.keyCode===79){menuOpen=!menuOpen}else if(e.keyCode===27){menuOpen=false}sync()});
+// ---------- tap / click anywhere to fire an extra shell
 cvs.addEventListener('pointerdown',e=>{if(!running())return;const z=-(1000+R()*400),d=new THREE.Vector3(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1,.5).unproject(camera).sub(camera.position).normalize(),t=Math.abs(z)/Math.max(.2,-d.z);
   new Shell(shellFromConfig(shellSize())).launchAt(d.x*t,Math.max(250,d.y*t),d.z*t)});
-sync();
 </script>
 </body></html>
